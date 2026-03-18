@@ -1,0 +1,9 @@
+(agent-shell-workspace
+ . [(20260319 1241) ((emacs (29 1)) (agent-shell (0 24 2)))
+    "Dedicated workspace for agent-shell" tar
+    ((:url . "https://github.com/gveres/agent-shell-workspace")
+     (:commit . "b72ccdb0b602d9a8ecd94f16aa3456155ba0b2e9")
+     (:revdesc . "b72ccdb0b602") (:keywords "convenience" "tools")
+     (:authors ("Gabor Veres" . "gabor.veres@gmail.com"))
+     (:maintainers ("Gabor Veres" . "gabor.veres@gmail.com"))
+     (:maintainer "Gabor Veres" . "gabor.veres@gmail.com"))])

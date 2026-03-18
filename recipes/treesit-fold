@@ -1,0 +1,4 @@
+(treesit-fold
+ :fetcher git
+ :url "https://github.com/emacs-tree-sitter/treesit-fold.git"
+ :commit "74eb0ea255564cb79799e2f5c7a3f14c1cbc088b")

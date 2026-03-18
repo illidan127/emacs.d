@@ -1,0 +1,9 @@
+(ivy-avy
+ . [(20250519 1747) ((emacs (24 5)) (ivy (0 15 1)) (avy (0 5 0)))
+    "Avy integration for Ivy" tar
+    ((:url . "https://github.com/abo-abo/swiper")
+     (:commit . "2257a9d0519e18f5ce7a7fafda8a1a8e5023628e")
+     (:revdesc . "2257a9d0519e") (:keywords "convenience")
+     (:authors ("Oleh Krehel" . "ohwoeowho@gmail.com"))
+     (:maintainers ("Basil L. Contovounesios" . "basil@contovou.net"))
+     (:maintainer "Basil L. Contovounesios" . "basil@contovou.net"))])

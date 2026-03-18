@@ -1,0 +1,1 @@
+(modalka :repo "chap9/modalka" :fetcher github)

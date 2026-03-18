@@ -1,0 +1,8 @@
+(pinentry
+ . [(20250408 220) nil "GnuPG Pinentry server implementation" tar
+    ((:url . "https://github.com/ueno/pinentry-el")
+     (:commit . "0079964a1dde954ccb2ce8a28613d8020c549a36")
+     (:revdesc . "0079964a1dde") (:keywords "gnupg")
+     (:authors ("Daiki Ueno" . "ueno@gnu.org"))
+     (:maintainers ("Daiki Ueno" . "ueno@gnu.org"))
+     (:maintainer "Daiki Ueno" . "ueno@gnu.org"))])

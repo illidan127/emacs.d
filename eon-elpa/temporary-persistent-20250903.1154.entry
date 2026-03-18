@@ -1,0 +1,10 @@
+(temporary-persistent
+ . [(20250903 1154)
+    ((emacs (24 3)) (names (20151201 0)) (dash (2 12 1)) (s (1 10 0)))
+    "Keep temp notes buffers persistent" tar
+    ((:url . "https://github.com/kostafey/temporary-persistent")
+     (:commit . "985287988a4440bbfacc2ca26bdd25186a7e1ce4")
+     (:revdesc . "985287988a44") (:keywords "temp" "buffers" "notes")
+     (:authors ("Kostafey" . "kostafey@gmail.com"))
+     (:maintainers ("Kostafey" . "kostafey@gmail.com"))
+     (:maintainer "Kostafey" . "kostafey@gmail.com"))])

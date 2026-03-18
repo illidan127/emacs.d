@@ -1,0 +1,2 @@
+(temporary-persistent :repo "chap9/temporary-persistent"
+                      :fetcher github)

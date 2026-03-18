@@ -1,0 +1,1 @@
+(agent-shell-workspace :fetcher github :repo "gveres/agent-shell-workspace")

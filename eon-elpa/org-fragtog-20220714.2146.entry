@@ -1,0 +1,9 @@
+(org-fragtog
+ . [(20220714 2146) ((emacs (27 1))) "Auto-toggle Org LaTeX fragments"
+    tar
+    ((:url . "https://github.com/io12/org-fragtog")
+     (:commit . "c675563af3f9ab5558cfd5ea460e2a07477b0cfd")
+     (:revdesc . "c675563af3f9")
+     (:authors ("Benjamin Levy" . "blevy@protonmail.com"))
+     (:maintainers ("Benjamin Levy" . "blevy@protonmail.com"))
+     (:maintainer "Benjamin Levy" . "blevy@protonmail.com"))])

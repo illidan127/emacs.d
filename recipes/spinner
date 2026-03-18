@@ -1,0 +1,4 @@
+(spinner
+ :fetcher git
+ :url "https://github.com/Malabarba/spinner.el.git"
+ :commit "d4647ae87fb0cd24bc9081a3d287c860ff061c21")

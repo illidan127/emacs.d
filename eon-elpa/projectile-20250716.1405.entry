@@ -1,0 +1,9 @@
+(projectile
+ . [(20250716 1405) ((emacs (26 1)))
+    "Manage and navigate projects in Emacs easily" tar
+    ((:url . "https://github.com/bbatsov/projectile")
+     (:commit . "9325c45e0fd96d5421e75ad901a91ee5353e10ad")
+     (:revdesc . "9325c45e0fd9") (:keywords "project" "convenience")
+     (:authors ("Bozhidar Batsov" . "bozhidar@batsov.dev"))
+     (:maintainers ("Bozhidar Batsov" . "bozhidar@batsov.dev"))
+     (:maintainer "Bozhidar Batsov" . "bozhidar@batsov.dev"))])

@@ -1,0 +1,5 @@
+(ai-code :fetcher github
+       :repo "tninja/ai-code-interface.el"
+       :files (;; new code layout:
+               "*.el" "etc/*.el"
+               (:exclude ".dir-locals.el")))

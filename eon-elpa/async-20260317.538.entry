@@ -1,0 +1,9 @@
+(async
+ . [(20260317 538) ((emacs (24 4))) "Asynchronous processing in Emacs"
+    tar
+    ((:url . "https://github.com/jwiegley/emacs-async")
+     (:commit . "475177f380c48ca36bc1f3dcdc61267448286897")
+     (:revdesc . "475177f380c4") (:keywords "async")
+     (:authors ("John Wiegley" . "jwiegley@gmail.com"))
+     (:maintainers ("Thierry Volpiatto" . "thievol@posteo.net"))
+     (:maintainer "Thierry Volpiatto" . "thievol@posteo.net"))])

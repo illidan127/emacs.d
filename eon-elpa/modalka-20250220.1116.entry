@@ -1,0 +1,8 @@
+(modalka
+ . [(20250220 1116) ((emacs (24 4))) "Modal editing your way" tar
+    ((:url . "https://github.com/mrkkrp/modalka")
+     (:commit . "c3f74e46559309cb331e1d47f517528f1d76167d")
+     (:revdesc . "c3f74e465593") (:keywords "convenience")
+     (:authors ("Mark Karpov" . "markkarpov92@gmail.com"))
+     (:maintainers ("Mark Karpov" . "markkarpov92@gmail.com"))
+     (:maintainer "Mark Karpov" . "markkarpov92@gmail.com"))])

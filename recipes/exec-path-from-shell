@@ -1,0 +1,4 @@
+(exec-path-from-shell
+ :fetcher git
+ :url "https://github.com/purcell/exec-path-from-shell.git"
+ :commit "4896a797252fbfdac32fb77508500ac7d220f717")

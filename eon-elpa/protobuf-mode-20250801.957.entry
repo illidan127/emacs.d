@@ -1,0 +1,8 @@
+(protobuf-mode
+ . [(20250801 957) nil "Major mode for editing protocol buffers" tar
+    ((:commit . "19e07d3da29a840e142df9dd315192999b342d9d")
+     (:revdesc . "19e07d3da29a")
+     (:keywords "google" "protobuf" "languages")
+     (:authors ("Alexandre Vassalotti" . "alexandre@peadrop.com"))
+     (:maintainers ("Alexandre Vassalotti" . "alexandre@peadrop.com"))
+     (:maintainer "Alexandre Vassalotti" . "alexandre@peadrop.com"))])

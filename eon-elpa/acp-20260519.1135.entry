@@ -1,0 +1,6 @@
+(acp
+ . [(20260519 1135) ((emacs (28 1)))
+    "An ACP (Agent Client Protocol) implementation" tar
+    ((:url . "https://github.com/xenodium/acp.el")
+     (:commit . "661af51569acef7384a2801f07a582da5142a6d9")
+     (:revdesc . "661af51569ac"))])

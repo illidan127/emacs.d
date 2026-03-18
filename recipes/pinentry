@@ -1,0 +1,5 @@
+(pinentry
+ :fetcher git
+ :url "https://github.com/ueno/pinentry-el.git"
+ :commit "0079964a1dde954ccb2ce8a28613d8020c549a36"
+ :files ("pinentry.el"))

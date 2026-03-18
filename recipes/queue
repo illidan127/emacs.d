@@ -1,0 +1,4 @@
+(queue
+ :fetcher git
+ :url "https://github.com/emacs-straight/queue.git"
+ :commit "8df1334d54d4735d2f821790422a850dfaaa08ef")

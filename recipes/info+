@@ -1,0 +1,4 @@
+(info+
+ :fetcher git
+ :url "https://github.com/emacsmirror/info-plus.git"
+ :commit "c6e26367abd2e99791f6e85fced2383de9ec605a")
