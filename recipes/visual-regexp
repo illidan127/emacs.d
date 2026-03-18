@@ -1,0 +1,5 @@
+(visual-regexp
+ :fetcher git
+ :url "https://github.com/benma/visual-regexp.el.git"
+ :commit "48457d42a5e0fe10fa3a9c15854f1f127ade09b5"
+ :files ("visual-regexp.el"))

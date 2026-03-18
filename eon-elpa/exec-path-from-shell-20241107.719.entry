@@ -1,0 +1,9 @@
+(exec-path-from-shell
+ . [(20241107 719) ((emacs (24 4)))
+    "Get environment variables such as $PATH from the shell" tar
+    ((:url . "https://github.com/purcell/exec-path-from-shell")
+     (:commit . "4896a797252fbfdac32fb77508500ac7d220f717")
+     (:revdesc . "4896a797252f") (:keywords "unix" "environment")
+     (:authors ("Steve Purcell" . "steve@sanityinc.com"))
+     (:maintainers ("Steve Purcell" . "steve@sanityinc.com"))
+     (:maintainer "Steve Purcell" . "steve@sanityinc.com"))])

@@ -1,0 +1,5 @@
+(smex
+ :fetcher git
+ :url "https://github.com/nonsequitur/smex.git"
+ :commit "55aaebe3d793c2c990b39a302eb26c184281c42c")
+

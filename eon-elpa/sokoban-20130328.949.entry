@@ -1,0 +1,7 @@
+(sokoban
+ . [(20130328 949) nil "Implementation of Sokoban for Emacs" tar
+    ((:commit . "962e97bb275b7d425ded54330c3057879968f726")
+     (:revdesc . "962e97bb275b") (:keywords "games")
+     (:authors ("Glynn Clements" . "glynn.clements@virgin.net"))
+     (:maintainers ("Glynn Clements" . "glynn.clements@virgin.net"))
+     (:maintainer "Glynn Clements" . "glynn.clements@virgin.net"))])

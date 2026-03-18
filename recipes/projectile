@@ -1,0 +1,5 @@
+(projectile
+ :fetcher git
+ :url "https://github.com/bbatsov/projectile.git"
+ :commit "9325c45e0fd96d5421e75ad901a91ee5353e10ad"
+ :files ("projectile.el"))

@@ -1,0 +1,5 @@
+(sokoban
+ :fetcher git
+ :url "https://github.com/leoliu/sokoban.git"
+ :commit "962e97bb275b7d425ded54330c3057879968f726"
+ :files ("sokoban.el" "sokoban.levels"))

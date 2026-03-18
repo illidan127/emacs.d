@@ -1,0 +1,3 @@
+(whisper :repo "natrys/whisper.el"
+         :fetcher github
+         :files ("whisper.el" "whisper-languages.el" "scripts/scrape-whisper-languages.txr"))

@@ -1,0 +1,5 @@
+(rime
+ :fetcher git
+ :url "https://github.com/DogLooksGood/emacs-rime.git"
+ :commit "1b70d9cfbac9b11a934007f103b1abc9a034268f"
+ :files (:defaults "lib.c" "Makefile"))

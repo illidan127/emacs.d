@@ -1,0 +1,11 @@
+(ai-code
+ . [(20260317 1616)
+    ((emacs (28 1)) (transient (0 9 0)) (magit (2 1 0)))
+    "Unified interface for AI coding backends such as Codex CLI, Copilot CLI, Claude Code, Gemini CLI, Opencode, Grok CLI, etc"
+    tar
+    ((:url . "https://github.com/tninja/ai-code-interface.el")
+     (:commit . "150b058ffafd30326f68347c10ba65e34b23189e")
+     (:revdesc . "150b058ffafd")
+     (:authors ("Kang Tu" . "tninja@gmail.com"))
+     (:maintainers ("Kang Tu" . "tninja@gmail.com"))
+     (:maintainer "Kang Tu" . "tninja@gmail.com"))])

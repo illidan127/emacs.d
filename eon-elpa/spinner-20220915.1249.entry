@@ -1,0 +1,11 @@
+(spinner
+ . [(20220915 1249) ((emacs (24 3)))
+    "Add spinners and progress-bars to the mode-line for ongoing operations"
+    tar
+    ((:url . "https://github.com/Malabarba/spinner.el")
+     (:commit . "d4647ae87fb0cd24bc9081a3d287c860ff061c21")
+     (:revdesc . "d4647ae87fb0") (:keywords "processes" "mode-line")
+     (:authors ("Artur Malabarba" . "emacs@endlessparentheses.com"))
+     (:maintainers
+      ("Artur Malabarba" . "emacs@endlessparentheses.com"))
+     (:maintainer "Artur Malabarba" . "emacs@endlessparentheses.com"))])

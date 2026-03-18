@@ -1,0 +1,5 @@
+(protobuf-mode
+ :fetcher git
+ :url "https://github.com/protocolbuffers/protobuf.git"
+ :commit "19e07d3da29a840e142df9dd315192999b342d9d"
+ :files ("editors/protobuf-mode.el"))

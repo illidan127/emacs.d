@@ -1,0 +1,5 @@
+(f
+ :fetcher git
+ :url "https://github.com/chap9/f.el.git"
+ :commit "9983806edb2f548916775835499900b520dc652e"
+ :files ("f.el"))

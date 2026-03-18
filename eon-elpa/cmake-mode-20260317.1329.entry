@@ -1,0 +1,5 @@
+(cmake-mode
+ . [(20260317 1329) ((emacs (24 1)))
+    "Major-mode for editing CMake sources" tar
+    ((:commit . "84aeddb4ea8211e0e9321789a7c8a75ee236f7b9")
+     (:revdesc . "84aeddb4ea82"))])

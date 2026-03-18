@@ -1,0 +1,8 @@
+(dired-hacks
+ . [(20250512 2) ((dash (2 5 0)))
+    "Collection of useful dired additions" tar
+    ((:commit . "de9336f4b47ef901799fe95315fa080fa6d77b48")
+     (:revdesc . "de9336f4b47e") (:keywords "files")
+     (:authors ("Matúš Goljer" . "matus.goljer@gmail.com"))
+     (:maintainers ("Matúš Goljer" . "matus.goljer@gmail.com"))
+     (:maintainer "Matúš Goljer" . "matus.goljer@gmail.com"))])

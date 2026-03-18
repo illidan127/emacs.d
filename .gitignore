@@ -1,0 +1,10 @@
+/straight/
+/tree-sitter/
+/data/
+/config/
+/elpa/
+/projects
+/smex-items
+/transient/
+/.emacs.desktop
+/eon-lisp/eon-secrets.el

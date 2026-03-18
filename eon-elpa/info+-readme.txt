@@ -1,0 +1,601 @@
+
+   Extensions to `info.el'.
+
+ More description below.
+
+ If you use Emacs 20, 21, or 22 then use library `info+20.el'
+ instead of `info+.el'.
+
+(@> "Index")
+
+ Index
+ -----
+
+ If you have library `linkd.el', load `linkd.el' and turn on
+ `linkd-mode' now.  It lets you easily navigate around the sections
+ of this doc.  Linkd mode will highlight this Index, as well as the
+ cross-references and section headings throughout this file.  You
+ can get `linkd.el' here:
+ https://www.emacswiki.org/emacs/download/linkd.el.
+
+ (@> "Things Defined Here")
+ (@> "Documentation")
+ (@> "Macros")
+ (@> "Faces (Customizable)")
+ (@> "User Options (Customizable)")
+ (@> "Internal Variables")
+ (@> "New Commands")
+ (@> "Replacements for Existing Functions")
+ (@> "Non-Interactive Functions")
+
+(@* "Things Defined Here")
+
+ Things Defined Here
+ -------------------
+
+ Commands defined here:
+
+   `Info-breadcrumbs-in-mode-line-mode',
+   `Info-change-visited-status' (Emacs 24+),
+   `Info-cycle-fontify-glossary-words',
+   `Info-cycle-link-glossary-words',
+   `Info-cycle-fontify-quotations', `Info-describe-bookmark' (Emacs
+   24.2+), `Info-define-custom-delimiting',
+   `Info-follow-nearest-node-new-window', `Info-glossary',
+   `Info-goto-node-web', `Info-history-clear',
+   `Info-make-node-unvisited', `info-manual',
+   `info-manual+node-buffer-name-mode', `Info-merge-subnodes',
+   `Info-mouse-follow-nearest-node-new-window',
+   `Info-outline-demote', `Info-outline-promote',
+   `Info-persist-history-mode' (Emacs 24.4+), `info-rename-buffer',
+   `Info-save-current-node', `Info-search-case-sensitively-next',
+   `Info-set-breadcrumbs-depth',
+   `Info-set-face-for-bookmarked-xref' (Emacs 24.2+),
+   `Info-toggle-breadcrumbs-in-header', `Info-toggle-fontify-all',
+   `Info-toggle-fontify-angle-bracketed',
+   `Info-toggle-fontify-bookmarked-xrefs' (Emacs 24.2+),
+   `Info-toggle-fontify-custom-delimited',
+   `Info-toggle-fontify-emphasis', `Info-toggle-fontify-extra',
+   `Info-toggle-fontify-glossary-words',
+   `Info-toggle-fontify-isolated-quote',
+   `Info-toggle-fontify-local-angle-bracketed',
+   `Info-toggle-fontify-local-angle-bracketed-same-line',
+   `Info-toggle-fontify-local-custom-delimited',
+   `Info-toggle-fontify-local-emphasis',
+   `Info-toggle-fontify-local-isolated-backquote',
+   `Info-toggle-fontify-local-isolated-quote',
+   `Info-toggle-fontify-local-quotation',
+   `Info-toggle-fontify-local-quotation-same-line',
+   `Info-toggle-fontify-reference-items',
+   `Info-toggle-fontify-visited-nodes',
+   `Info-toggle-node-access-invokes-bookmark' (Emacs 24.4+),
+   `Info-toc-outline', `Info-toc-outline-refontify-region',
+   `Info-url-for-node', `Info-variable-pitch-text-mode',
+   `Info-virtual-book'.
+
+ Faces defined here:
+
+   `info-command-ref-item', `info-constant-ref-item',
+   `info-custom-delimited', `info-double-quoted-name',
+   `info-emphasis', `info-file', `info-fixed-pitch',
+   `info-function-ref-item', `info-glossary-word',
+   `info-homoglyph', `info-indented-text',
+   `info-isolated-backquote', `info-isolated-quote',
+   `info-macro-ref-item', `info-menu', `info-node',
+   `info-quoted-name', `info-reference-item',
+   `info-special-form-ref-item', `info-string',
+   `info-syntax-class-item', `info-user-option-ref-item',
+   `info-variable-ref-item', `info-xref-bookmarked' (Emacs 24.2+).
+
+ Options (user variables) defined here:
+
+   `Info-apropos-manuals', `Info-bookmarked-node-xref-faces' (Emacs
+   24.2+), `Info-bookmark-use-only-node-not-file-flag',
+   `Info-breadcrumbs-in-header-flag', `info-buffer-name-function',
+   `Info-display-node-header-fn', `Info-emphasis-regexp',
+   `Info-fit-frame-flag', `Info-fontify-angle-bracketed-flag',
+   `Info-fontify-bookmarked-xrefs-flag' (Emacs 24.2+),
+   `Info-fontify-custom-delimited', `Info-fontify-emphasis-flag',
+   `Info-fontify-extra-function', `Info-fontify-glossary-words',
+   `Info-fontify-indented-text-chars',
+   `Info-fontify-indented-text-manuals',
+   `Info-fontify-isolated-quote-flag', `Info-fontify-quotations',
+   `Info-fontify-reference-items-flag',
+   `Info-glossary-fallbacks-alist', `Info-link-glossary-words',
+   `Info-node-access-invokes-bookmark-flag' (Emacs 24.4+),
+   `Info-saved-history-file' (Emacs 24.4+), `Info-saved-nodes',
+   `Info-subtree-separator', `Info-toc-outline-no-redundancy-flag'.
+
+ Macros defined here:
+
+   `info-user-error'.
+
+ Non-interactive functions defined here:
+
+   `Info--manuals', `Info--member-string-nocase',
+   `info--msg-Info-fontify-glossary-words-now',
+   `Info--pop-to-buffer-same-window', `info--user-search-failed',
+   `Info-bookmark-for-node', `Info-bookmark-name-at-point',
+   `Info-bookmark-named-at-point', `Info-bookmark-name-for-node',
+   `info-buffer-name-function-default',
+   `Info-case-insensitive-string=',
+   `Info-case-insensitive-string-hash', `info-custom-delim-1',
+   `info-custom-delim-2', `Info-defontify',
+   `Info-defontify-current-node',
+   `Info-display-node-default-header',
+   `info-fallback-manual-for-glossary',
+   `Info-fontify-custom-delimited', `Info-fontify-glossary-words',
+   `Info-fontify-indented-text', `info-fontifying-regexp',
+   `Info-fontify-quotations', `Info-fontify-reference-items',
+   `Info-get-glossary-hash-table-create',
+   `Info-goto-glossary-definition', `info-indented-text-regexp',
+   `Info-insert-breadcrumbs-in-mode-line', `Info-isearch-search-p',
+   `Info-manual-string', `Info-manual-symbol',
+   `Info-node-name-at-point',
+   `Info-read-bookmarked-node-name', `Info-refontify-current-node',
+   `Info-remap-default-face-to-variable-pitch',
+   `Info-restore-history-list' (Emacs 24.4+),
+   `Info-save-history-list' (Emacs 24.4+), `Info-search-beg',
+   `Info-search-end', `Info-toc-outline-find-node',
+   `Info-toc-outline-refontify-links', `Info-toggle-fontify-local'.
+
+ Internal variables defined here:
+
+   `Info-breadcrumbs-depth-internal',
+   `info-custom-delimited-same-line-regexp',
+   `info-fontify-emphasis', `Info-glossary-link-history',
+   `info-glossary-link-map', `info-good-fixed-pitch-font-families',
+   `info-indented-text-regexp', `info-isolated-backquote-regexp',
+   `info-isolated-quote-regexp',
+   `info-last-non-nil-fontify-extra-function',
+   `info-last-non-nil-fontify-glossary-words', `Info-link-faces',
+   `Info-merged-map', `Info-mode-syntax-table',
+   `Info-no-glossary-manuals', `info-nomatch',
+   `info-quotation-regexp', `info-quotation-same-line-regexp',
+   `info-quoted+<>-regexp', `info-quoted+<>-same-line-regexp',
+   `info-remap-default-face-cookie',
+   `info-symbols-and-replacements' (Emacs <27),
+   `Info-toc-outline-map'.
+
+
+ ***** NOTE: The following standard faces defined in `info.el'
+             have been REDEFINED HERE:
+
+ `info-title-1', `info-title-2', `info-title-3', `info-title-4'.
+
+
+ ***** NOTE: The following standard functions defined in `info.el'
+             have been REDEFINED or ADVISED HERE:
+
+ `info-apropos' - Apropos, not literal string, match by default.
+                  Use other window if not already in Info.
+ `Info-apropos-matches' - Added optional arg REGEXP-P.
+ `Info-backward-node' - Prefix arg clones buffer.
+ `Info-bookmark-jump' -
+    Respect option `Info-bookmark-use-only-node-not-file-flag'.
+ `Info-directory' - Prefix arg clones buffer.
+ `info-display-manual' - Use completion to input manual name.
+ `Info-find-emacs-command-nodes' - Added arg MSGP and message.
+ `Info-find-file' - Handle virtual books.
+ `Info-find-node', `Info-find-node-2' -
+    Call `fit-frame' if `Info-fit-frame-flag'.
+    Added optional arg NOMSG.
+ `Info-fontify-node' -
+    1. Show breadcrumbs in header line and/or mode line.
+    2. File name in face `info-file'.
+    3. Node names in face `info-node'.
+    4. Menu items in face `info-menu'.
+    5. Only 5th and 9th menu items have their `*' colored.
+    6. Notes in face `info-xref'.
+    7. If `Info-fontify-emphasis-flag', then fontify _..._.
+    8. If `Info-fontify-quotations', then fontify ‘...’ or
+       `...' in face `info-quoted-name', “...” in face
+       `info-double-quoted-name',  and "..." in face `info-string'.
+    9. If `Info-fontify-quotations' and
+       `Info-fontify-angle-bracketed-flag' then fontify <...> in
+       face `info-quoted-name'.
+   10. If `Info-fontify-quotations' and
+       `Info-fontify-isolated-quote-flag' then fontify ' in face
+       `info-isolated-quote', and fontify ` in face
+       `info-isolated-backquote'.
+ `Info-forward-node' - Prefix arg clones buffer.
+ `Info-goto-emacs-command-node' -
+    1. Uses `completing-read' in interactive spec, with,
+       as default, `symbol-nearest-point'.
+    2. Added optional arg MSGP.
+    3. Message if single node found.
+    4. Returns `num-matches' if found; nil if not.
+ `Info-goto-emacs-key-command-node' -
+    1. Added optional arg MSGP.
+    2. If key's command not found, then `Info-search's for key
+       sequence in text and displays message about repeating.
+ `Info-goto-node' - Respect option
+    `Info-node-access-invokes-bookmark-flag' (Emacs 24.4+).
+ `Info-history' - A prefix arg clears the history.
+ `Info-history-back' - Prefix arg clones buffer.
+ `Info-history-forward' - Prefix arg clones buffer.
+ `Info-insert-dir' -
+    Added optional arg NOMSG to inhibit showing progress msgs.
+ `Info-isearch-search' - Respect restriction to active region.
+ `Info-isearch-wrap' - Respect restriction to active region.
+ `Info-mode' - Doc string shows all bindings.
+ `Info-next' - Prefix arg clones buffer.
+ `Info-prev' - Prefix arg clones buffer.
+ `Info-read-node-name'   - Added optional arg DEFAULT.
+ `Info-search' - 1. Fits frame.
+                 2. Highlights found regexp if `search-highlight'.
+ `Info--search-loop' - Use `Info-search-beg' and `Info-search-end'.
+ `Info-set-mode-line' - Handles breadcrumbs in the mode line.
+ `Info-mouse-follow-nearest-node' - With prefix arg, show node in
+                                    a new Info buffer.
+ `Info-up' - Prefix arg clones buffer.
+
+
+ ***** NOTE: The following standard function
+             has been REDEFINED HERE:
+
+ `outline-invisible-p' - Fixes Emacs bug #28080.
+
+(@* "Documentation")
+
+ Documentation
+ -------------
+
+ Library `info+.el' extends the standard Emacs library `info.el' in
+ many ways.  It provides these features:
+
+ * Association of additional information (metadata) with Info
+   nodes.  You do this by bookmarking the nodes.  Library Bookmark+
+   gives you the following features in combination with `info+.el'.
+   In many ways an Info node and its default bookmark can be
+   thought of as the same animal.
+
+   - Rich node metadata.  In particular, you can tag nodes with any
+     number of arbitrary tags, to classify them in different and
+     overlapping ways.  You can also annotate them (in Org mode, by
+     default).
+
+   - You can use `C-h C-b' to show the metadata for a (bookmarked)
+     node.  This is all of the associated bookmark information,
+     including the annotation and tags for that node and the number
+     of times you have visited it.  If invoked with point on a
+     link, the targeted node is described; otherwise, you are
+     prompted for the node name.
+
+   - Links for bookmarked nodes can have a different face, to let
+     you know that those nodes have associated metadata.  Option
+     `Info-fontify-bookmarked-xrefs-flag' controls whether this is
+     done.
+
+   - The face for this is `info-xref-bookmarked' by default, but
+     you can set the face to use for a given Info bookmark using
+     `C-x f' (command `Info-set-face-for-bookmarked-xref').  This
+     gives you an easy way to classify nodes and show the class of
+     a node by its links.  Uses faces to make clear which nodes are
+     most important to you, or which are related to this or that
+     general topic.
+
+   - You can use command `Info-make-node-unvisited' to make a node
+     be considered unvisited.  By default the node at point is
+     used.  For a node that is not bookmarked this also gives links
+     to the node face `info-xref', which indicates that their
+     targets are unvisited.  If for some reason you want to make
+     links to a bookmarked node also have this face then just use
+     command `Info-set-face-for-bookmarked-xref', specifying face
+     `info-xref'.
+
+   - If option `Info-node-access-invokes-bookmark-flag' is non-nil
+     then going to a bookmarked Info node invokes its bookmark, so
+     that the node metadata (such as number of visits) gets
+     updated.  Command `Info-toggle-node-access-invokes-bookmark'
+     toggles the option value.
+
+   - You can automatically bookmark nodes you visit, by enabling
+     mode `bmkp-info-auto-bookmark-mode'.  Toggle the mode off
+     anytime you do not want to record Info visits.
+
+   - In the bookmark-list display (from `C-x r l') you can sort
+     bookmarks by the time of last visit (`s d') or by the number
+     of visits (`s v').  This gives you an easy way to see which
+     parts of which Info manuals you have visited most recently and
+     how much you have visited them.
+
+ * Editable, outline-enabled tables of contents (TOCs).  Command
+   `Info-toc-outline' (bound to `O') opens a separate Info buffer
+   showing the table of contents (TOC).  This is similar to the
+   standard command `Info-toc' (bound to `T'), but the buffer is
+   cloned from the manual and is in `outline-minor-mode'.  Also,
+   there is no redundancy, by default: each TOC entry is listed
+   only once, not multiple times.  (This is controlled by option
+   `Info-toc-outline-no-redundancy-flag'.)
+
+   - You can have any number of such TOCs, for the same manual or
+     for different manuals.
+
+   - Outline minor mode lets you hide and show, and promote and
+     demote, various parts of the TOC tree for a manual.  And since
+     the TOC is editable you can make other changes to it: sort
+     parts of it, delete parts of it, duplicate parts of it, move
+     parts aroundin an ad hoc way, and so on.  Info+ makes the
+     outlining commands behave, so that hidden Info text
+     (e.g. markup text such as `*note'...`::' surrounding links) is
+     kept hidden.
+
+   - (Emacs 24.4+) Especially when combined with
+     `Info-persist-history-mode', command
+     `Info-change-visited-status' (`C-x DEL', see below), and the
+     Info+ bookmarking enhancements (e.g., special link
+     highlighting and persistently tracking the number of visits
+     per node), `Info-toc-outline' gives you a way to organize
+     access and visibility of a manual's nodes, to reflect how you
+     use it.
+
+ * Additional, finer-grained Info highlighting.  This can make a
+   big difference in readability.
+
+   - In the Emacs Lisp manual, reference items are highlighted, so
+     they stand out.  This means: constants, commands, functions,
+     macros, special forms, syntax classes, user options, and other
+     variables.
+
+   - Single-quoted text, like `text' or ‘text’, and double-quoted
+     text, like "text" or “text”, is highlighted if option
+     `Info-fontify-quotations' is non-`nil'.  If the non-nil value
+     is `t' (the default) then, for the case of `...', only text
+     quoted on the same line is highlighted.  If the non-nil value
+     is `multiline' then even multiline text quoted with `...' is
+     highlighted.
+
+   - Angle-bracketed names, like <tab>, are highlighted if
+     `Info-fontify-angle-bracketed-flag' and
+     `Info-fontify-quotations' are both non-`nil'.
+
+   - Isolated single quotes and backquote chars, as in 'foobar and
+     `foobar, are highlighted if `Info-fontify-quotations' and
+     `Info-fontify-isolated-quote-flag' are both non-`nil'.
+
+   - Emphasized text, that is, text enclosed in underscore
+     characters, like _this is emphasized text_, is
+     highlighted if `Info-fontify-emphasis-flag' is non-`nil'.
+     (But if internal variable `info-fontify-emphasis' is `nil'
+     then there is no such highlighting, and that option has no
+     effect.)
+
+   - Glossary words, that is, words that are defined in a manual's
+     `Glossary' node, are highlighted and linked to their glossary
+     entries, if option `Info-fontify-glossary-words' is non-nil.
+
+     Glossary terms of more than one word are not highlighted or
+     linked.  Currently only the Emacs and Semantic manuals have
+     `Glossary' nodes, as far as I know.
+
+     By default, a glossary link is fontified (with face
+     `info-glossary-word'), and by default the link (the face) is
+     shown only until you follow a link for that word to the
+     glossary.  This reduces clutter for words you've already
+     looked up.  Their first occurrences in nodes are still linked,
+     but the links are only evident on mouseover (using property
+     `mouse-face').
+
+     By default also, mouseover shows the word's definition in a
+     tooltip (or in the echo area if `tooltip-mode' is off).  You
+     can optionally not show the definition this way.
+
+     To reduce clutter even more, you can optionally hide glossary
+     links (no face), showing them only on mouseover.
+
+     All glossary-link behaviors are specified with option
+     `Info-fontify-glossary-words'.
+
+     You can cycle or toggle the option value using command
+     `Info-cycle-fontify-glossary-words' or
+     `Info-toggle-fontify-glossary-words'.
+
+   - Text between two delimiters that you specify, if the car of
+     option `Info-fontify-custom-delimited' is non-nil.
+
+   - Any extra highlighting you want in a node, as defined by the
+     value of option `Info-fontify-extra-function' - a function
+     that accepts no args.
+
+   - Be aware that any such highlighting is not 100% foolproof.
+     Especially for a manual such as Emacs or Elisp, where
+     arbitrary keys and characters can be present anywhere, the
+     highlighting can be thrown off.
+
+   - You can cycle or toggle the `Info-fontify-*' options from the
+     `Info' menu, or using command `Info-cycle-fontify-quotations'
+     or an `Info-toggle-fontify-*' command.  For example, command
+     `Info-toggle-fontify-emphasis' toggles option
+     `Info-fontify-emphasis-flag'.
+
+   - Minor mode `Info-variable-pitch-text-mode' uses a
+     variable-pitch font for Info text.  If you enable this then
+     you might also want to customize option
+     `Info-fontify-indented-text-chars', so indented text such as
+     code uses a fixed-pitch font (face `info-indented-text').
+
+   - Non-nil option `Info-fontify-indented-text-chars' means
+     fontify text that is indented at least that many characters
+     (default 10).  In the Elisp manual this often means blocks of
+     code and ASCII-art diagrams.  But in general there's no
+     telling what is indented at any given level, so caveat emptor.
+     Think of this as an experimental feature.
+
+   - Option `Info-fontify-indented-text-manuals' is a list of
+     manuals that should use `Info-fontify-indented-text-chars'.
+     By default this is just the Elisp manual: (elisp).
+
+   - You can define specific highlighting for individual manuals.
+     To do this, you `put' the regexp you want for a given regexp
+     variable on the manual symbol.  For example, if MY-REGEXP is a
+     regexp string then this defines the regexp to use for a
+     quotation as being MY-REGEXP, but only for the Elisp manual:
+
+       (put 'elisp 'info-quotation-regexp MY-REGEXP)
+
+     Then you can toggle that highlighting separately, using
+     command `Info-toggle-fontify-local-quotation'.  There's such a
+     command for each regexp variable.  When you toggle a
+     particular kind of manual-local highlighting OFF in the
+     current manual, the global highlighting of that kind takes
+     over there.
+
+     Instead of explicitly setting the variable value for a manual
+     using `put', you can just use the local toggle command (such
+     as `Info-toggle-fontify-local-quotation') with a prefix arg.
+     That prompts you for the regexp to use locally, for the
+     current manual.
+
+     You can also use such local highlighting to just turn OFF the
+     global highlighting for a given regexp variable.  To do that,
+     use a prefix arg with the toggle command, and when prompted
+     for the regexp, type `$-'.  That's a regexp that cannot match
+     anything.  When using Lisp, use the value of constant
+     `info-nomatch' - that prevents even trying to match. For
+     example:
+
+       (put 'some-manual 'info-isolated-quote-regexp info-nomatch)
+
+     This is already done by default for the isolated-quote regexp
+     variables, for several manuals that don't involve (much) Elisp
+     code with such chars: `ada', `bovine', `calc', `emacs-gnutls',
+     `epa', `eshell', `eww', `info', `nxml', `pcl-cvs', `smtpmail',
+     `srecode', `todo-mode', `wisent'.  The manuals you have may
+     well be different from those Emacs provides by default, and
+     you might want to add or remove such highlighting.
+
+ * Optionally showing breadcrumbs in the mode line or the header
+   line, or both. See where you are in the Info hierarchy, and
+   access higher nodes directly.
+
+   - In the mode line.  Turned on by default.
+
+     See ‘Toggle Breadcrumbs’ in the `mouse-3' mode-line menu and
+     `Toggle Breadcrumbs in Mode Line' in the `Info' menu (in the
+     menu-bar or in the minor-mode indicator). You can customize
+     option `Info-breadcrumbs-in-mode-line-mode' if you want to
+     turn this off by default. (Available for Emacs 23+ only.)
+
+   - In the header (just below the header line).
+
+     (I also added this to vanilla Emacs 23.)  This is OFF by
+     default in `Info+'.  See `Toggle Breadcrumbs in Header Line'
+     in `Info' menu.  Be aware that unlike breadcrumbs in the mode
+     line, this can occasionally throw off the destination accuracy
+     of cross references and searches slightly.
+
+ * Optional automatic renaming of Info buffers to include the
+   manual (file) and node names, using minor mode
+   `info-manual+node-buffer-name-mode'.  You can use option
+   `info-buffer-name-function' to customize the format of the
+   buffer names.
+
+ * Additional commands, including:
+
+   - `Info-virtual-book' (bound to `v') – Open a virtual Info
+     manual of saved nodes from any number of manuals.  The nodes
+     are those saved in option `Info-virtual-book'.  With `C-u',
+     bookmarked Info nodes are also included.  (If you use Icicles,
+     see also `icicle-Info-virtual-book'.)
+
+   - `Info-persist-history-mode' (Emacs 24.4+) - Enabling this
+     minor mode saves the list of your visited Info nodes between
+     Emacs sessions.  Together with command `Info-history' (bound
+     to `L' by default), this gives you a persistent virtual manual
+     of the nodes you have visited in the past.  If the mode is
+     enabled then the list of visited nodes is saved to the file
+     named by option `Info-saved-history-file' when you quit Emacs
+     (not Info) or when you kill an Info buffer.
+
+     (If you also use library Bookmark+ then you can bookmark Info
+     nodes, including automatically.  This records how many times
+     you have visited each node and when you last did so.)
+
+   - `Info-change-visited-status' (Emacs 24.4+) (bound to `C-x
+     DEL') - Toggle or set the visited status of the node at point
+     or the nodes in the active region.  Useful if you use
+     `Info-fontify-visited-nodes' to show you which nodes you have
+     visited.  No prefix arg: toggle.  Non-negative prefix arg: set
+     to visited.  Negative prefix arg: set to unvisited.
+
+   - `Info-save-current-node' (bound to `.') – Save the name of the
+     current node to list `Info-saved-nodes', for use by `v'
+     (`Info-virtual-book').
+
+   - `Info-merge-subnodes' – Integrate the current Info node with
+     its subnodes (the nodes in its Menu), perhaps recursively.
+
+     Use `Info-merge-subnodes' to extract a self-contained report
+     (possibly the whole manual) from an Info manual.  The report
+     is itself an Info buffer, with hyperlinks and normal Info
+     behavior.
+
+     There are various prefix-argument possibilities that govern
+     just how subnodes are treated (recursively or not, for
+     instance).  There are a few user options that let you
+     customize the report appearance.
+
+
+ The following bindings are made here for Info-mode:
+
+   `?'              `describe-mode' (replaces `Info-summary')
+   `+'              `Info-merge-subnodes'
+   `.'              `Info-save-current-node'
+   `a'              `info-apropos'
+   `G'              `Info-goto-node-web'
+   `O'              `Info-toc-outline'
+   `v'              `Info-virtual-book'
+   `mouse-4'        `Info-history-back'
+   `mouse-5'        `Info-history-forward'
+   `S-down-mouse-2' `Info-mouse-follow-nearest-node-new-window'
+   `S-RET'          `Info-follow-nearest-node-new-window'
+
+ The following bindings are made here for merged Info buffers:
+
+   `.'              `beginning-of-buffer'
+   `b'              `beginning-of-buffer'
+   `q'              `quit-window'
+   `s'              `nonincremental-re-search-forward'
+   `M-s'            `nonincremental-re-search-forward'
+   `TAB'            `Info-next-reference'
+   `ESC TAB'        `Info-prev-reference'
+
+ The global binding `C-h r' is changed from `info-emacs-manual' to
+ `info-manual', which behaves the same except if you use a prefix
+ arg.  With a prefix arg you can open any manual, choosing either
+ from all installed manuals or from those that are already shown in
+ Info buffers.
+
+ The following behavior defined in `info.el' has been changed:
+  "*info" has been removed from `same-window-buffer-names', so that
+  a separate window can be used if you so choose.
+
+ Suggestion: Use a medium-dark background for Info.  Try, for
+ example, setting the background to "LightSteelBlue" in your
+ `~/.emacs' file.  You can do this as follows:
+
+        (setq special-display-buffer-names
+              (cons '("*info*" (background-color . "LightSteelBlue"))
+                    special-display-buffer-names))
+
+ Alternatively, you can change the background value of
+ `special-display-frame-alist' and set `special-display-regexps' to
+ something matching "*info*":
+
+        (setq special-display-frame-alist
+              (cons '(background-color . "LightSteelBlue")
+                    special-display-frame-alist))
+        (setq special-display-regexps '("[ ]?[*][^*]+[*]"))
+
+ If you do use a medium-dark background for Info, consider
+ customizing face to a lighter foreground color - I use "Yellow".
+
+ Also, consider customizing face `link' to remove its underline
+ attribute.
+
+ This file should be loaded after loading the standard GNU file
+ `info.el'.  So, in your `~/.emacs' file, do this:
+ (eval-after-load "info" '(require 'info+))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

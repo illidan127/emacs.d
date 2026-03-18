@@ -1,0 +1,11 @@
+(info+
+ . [(20250108 435) nil "Extensions to `info.el'" tar
+    ((:url . "https://www.emacswiki.org/emacs/download/info%2b.el")
+     (:commit . "c6e26367abd2e99791f6e85fced2383de9ec605a")
+     (:revdesc . "c6e26367abd2") (:keywords "help" "docs" "internal")
+     (:maintainers
+      ("Drew Adams (concat \"drew.adams\" \"oracle\" \".com\""
+       . "\"@\" "))
+     (:maintainer
+      "Drew Adams (concat \"drew.adams\" \"oracle\" \".com\""
+      . "\"@\" "))])

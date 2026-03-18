@@ -1,0 +1,10 @@
+(direnv
+ . [(20240314 715) ((emacs (25 1)) (dash (2 12 0)))
+    "Direnv integration" tar
+    ((:url . "https://github.com/wbolster/emacs-direnv")
+     (:commit . "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f")
+     (:revdesc . "c0bf3b81c7a9")
+     (:keywords "direnv" "environment" "processes" "unix" "tools")
+     (:authors ("wouter bolsterlee" . "wouter@bolsterl.ee"))
+     (:maintainers ("wouter bolsterlee" . "wouter@bolsterl.ee"))
+     (:maintainer "wouter bolsterlee" . "wouter@bolsterl.ee"))])

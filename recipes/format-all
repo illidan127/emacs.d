@@ -1,0 +1,4 @@
+(format-all
+ :fetcher git
+ :url "https://github.com/lassik/emacs-format-all-the-code.git"
+ :commit "fd9c013f5f8094fef99ddabde07d9041737b8454")

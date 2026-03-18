@@ -1,0 +1,4 @@
+(posframe
+ :fetcher git
+ :url "https://github.com/tumashu/posframe.git"
+ :commit "12f540c9ad5da09673b2bca1132b41f94c134e82")

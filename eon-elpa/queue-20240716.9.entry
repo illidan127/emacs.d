@@ -1,0 +1,10 @@
+(queue
+ . [(20240716 9) ((cl-lib (0 5))) "Queue data structure" tar
+    ((:url . "http://www.dr-qubit.org/emacs.php")
+     (:commit . "8df1334d54d4735d2f821790422a850dfaaa08ef")
+     (:revdesc . "8df1334d54d4")
+     (:keywords "extensions" "data structures" "queue")
+     (:authors ("Inge Wallin" . "inge@lysator.liu.se")
+	       ("Toby Cubitt" . "toby-predictive@dr-qubit.org"))
+     (:maintainers ("Toby Cubitt" . "toby-predictive@dr-qubit.org"))
+     (:maintainer "Toby Cubitt" . "toby-predictive@dr-qubit.org"))])

@@ -1,0 +1,10 @@
+(parseedn
+ . [(20231203 1909) ((emacs (26)) (parseclj (1 1 1)) (map (2)))
+    "Clojure/EDN parser" tar
+    ((:url . "http://www.github.com/clojure-emacs/parseedn")
+     (:commit . "3407e4530a367b6c2b857dae261cdbb67a440aaa")
+     (:revdesc . "3407e4530a36")
+     (:keywords "lisp" "clojure" "edn" "parser")
+     (:authors ("Arne Brasseur" . "arne@arnebrasseur.net"))
+     (:maintainers ("Arne Brasseur" . "arne@arnebrasseur.net"))
+     (:maintainer "Arne Brasseur" . "arne@arnebrasseur.net"))])

@@ -1,0 +1,4 @@
+(package-build
+ :fetcher git
+ :url "https://github.com/melpa/package-build.git"
+ :commit "79fbbb9df3a4dfa9fb7a3f547b6f1982fde508bb")

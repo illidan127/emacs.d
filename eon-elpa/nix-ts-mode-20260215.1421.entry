@@ -1,0 +1,9 @@
+(nix-ts-mode
+ . [(20260215 1421) ((emacs (29 1)))
+    "Major mode for Nix expressions, powered by tree-sitter" tar
+    ((:url . "https://github.com/nix-community/nix-ts-mode")
+     (:commit . "319831712125e8c9e4f14b66def518d7a633685c")
+     (:revdesc . "319831712125")
+     (:keywords "nix" "languages" "tree-sitter")
+     (:maintainers ("Remi Gelinas" . "mail@remigelin.as"))
+     (:maintainer "Remi Gelinas" . "mail@remigelin.as"))])

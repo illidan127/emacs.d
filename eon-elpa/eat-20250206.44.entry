@@ -1,0 +1,9 @@
+(eat
+ . [(20250206 44) ((emacs (26 1)) (compat (29 1)))
+    "Emulate A Terminal, in a region, in a buffer and in Eshell" tar
+    ((:url . "https://codeberg.org/akib/emacs-eat")
+     (:commit . "c8d54d649872bfe7b2b9f49ae5c2addbf12d3b99")
+     (:revdesc . "c8d54d649872") (:keywords "terminals" "processes")
+     (:authors ("Akib Azmain Turja" . "akib@disroot.org"))
+     (:maintainers ("Akib Azmain Turja" . "akib@disroot.org"))
+     (:maintainer "Akib Azmain Turja" . "akib@disroot.org"))])

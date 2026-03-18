@@ -1,0 +1,5 @@
+(flyover
+ :fetcher git
+ :url "https://github.com/chap9/flyover.git"
+ :commit "46ec62f3a203e1b5d351a4ed42a38d93eca14b7c"
+ :files ("flyover.el"))

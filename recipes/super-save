@@ -1,0 +1,4 @@
+(super-save
+ :fetcher git
+ :url "https://github.com/bbatsov/super-save.git"
+ :commit "b612da0b37859a23375366b725b1ab7e7fea02fd")

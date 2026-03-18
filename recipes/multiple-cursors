@@ -1,0 +1,4 @@
+(multiple-cursors
+ :fetcher git
+ :url "https://github.com/magnars/multiple-cursors.el.git"
+ :commit "89f1a8df9b1fc721b1672b4c7b6d3ab451e7e3ef")

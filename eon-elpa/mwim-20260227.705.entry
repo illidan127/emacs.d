@@ -1,0 +1,9 @@
+(mwim
+ . [(20260227 705) ((seq (2 24)))
+    "Switch between the beginning/end of line or code" tar
+    ((:url . "https://github.com/alezost/mwim.el")
+     (:commit . "e44a7a0a76262d7000b726bfa848cc62e21d7985")
+     (:revdesc . "e44a7a0a7626") (:keywords "convenience")
+     (:authors ("Alex Kost" . "alezost@gmail.com"))
+     (:maintainers ("Alex Kost" . "alezost@gmail.com"))
+     (:maintainer "Alex Kost" . "alezost@gmail.com"))])

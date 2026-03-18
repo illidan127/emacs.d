@@ -1,0 +1,5 @@
+(youdao-dictionary
+ :fetcher git
+ :url "https://github.com/xuchunyang/youdao-dictionary.el.git"
+ :commit "eae8efb1efd3fc82cfe87a357fe8f764116d94ef"
+ :files ("youdao-dictionary.el"))
