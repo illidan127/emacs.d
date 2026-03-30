@@ -8,3 +8,4 @@
 /transient/
 /.emacs.desktop
 /eon-lisp/eon-secrets.el
+/.agent-shell/

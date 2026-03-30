@@ -55,3 +55,4 @@
 (require 'eon-pdf)
 (require 'eon-info-help)
 (require 'eon-diff)
+(put 'narrow-to-region 'disabled nil)
