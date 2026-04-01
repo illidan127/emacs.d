@@ -69,4 +69,6 @@
   :hook
   (flycheck-mode . flyover-mode))
 
+(use-package agent-shell)
+
 (provide 'eon-program)

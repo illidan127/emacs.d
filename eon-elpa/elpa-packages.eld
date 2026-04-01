@@ -1,6 +1,6 @@
 (((ace-window :url "https://github.com/abo-abo/ace-window")
   (acp :url "https://github.com/xenodium/acp.el")
-  (agent-shell :url "https://github.com/xenodium/agent-shell")
+  (agent-shell :url "https://github.com/illidan127/agent-shell")
   (ai-code :url "https://github.com/tninja/ai-code-interface.el")
   (aider :url "https://github.com/tninja/aider.el")
   (all-the-icons :url "https://github.com/domtronn/all-the-icons.el")
