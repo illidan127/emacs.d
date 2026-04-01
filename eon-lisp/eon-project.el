@@ -109,7 +109,7 @@
   :hook
   (emacs-startup . (lambda () (persp-state-load persp-state-default-file)))
   (kill-emacs . persp-state-save)
-  (persp-switch . (lambda () (set-frame-name (persp-current-name))))
+  (persp-switch . (lambda () (set-frame-name (persp-current-name)) (persp-state-save)))
   (persp-after-rename . persp-state-save)
   (persp-created . persp-state-save)
   :init
