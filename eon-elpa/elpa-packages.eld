@@ -20,6 +20,7 @@
   (company :url "https://github.com/company-mode/company-mode")
   (company-box :url "https://github.com/sebastiencs/company-box")
   (company-posframe :url "https://github.com/tumashu/company-posframe.git")
+  (cond-let :url "https://github.com/tarsius/cond-let")
   (counsel :url "https://github.com/abo-abo/swiper.git")
   (counsel-projectile :url "https://github.com/ericdanan/counsel-projectile")
   (dap-mode :url "https://github.com/emacs-lsp/dap-mode")
