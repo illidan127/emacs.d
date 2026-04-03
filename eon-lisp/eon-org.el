@@ -127,6 +127,20 @@
 
 (defvar eon-agenda-query-regexp nil)
 
+(defcustom eon-auto-tags nil
+  "插入标题时自动添加的 Org 属性名列表。
+非空时，对每个元素调用 `org-set-property'，属性名为该元素（字符串或符号），值为空字符串。"
+  :group 'eon
+  :type '(repeat (choice string symbol)))
+
+(defun eon-org-insert-heading-add-properties-from-auto-tags ()
+  "当 `eon-auto-tags' 为非空列表时，为当前标题按列表项添加空属性值。"
+  (when (and eon-auto-tags
+             (listp eon-auto-tags))
+    (dolist (prop eon-auto-tags)
+      (when prop
+        (org-set-property (if (stringp prop) prop (symbol-name prop)) "-")))))
+
 (defun eon-tasks-counsel-org-goto-action (x)
   "定位到某个工作计划表，并更新其内容"
   (org-goto-marker-or-bmk (cdr x))
@@ -160,6 +174,14 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (put 'auto-revert-mode 'safe-local-variable #'booleanp)
   (put 'eon-plantuml-output-prefix 'safe-local-variable #'stringp)
   (put 'eon-dot-output-prefix 'safe-local-variable #'stringp)
+  (put 'eon-auto-tags 'safe-local-variable
+       (lambda (val)
+         (or (null val)
+             (and (listp val)
+                  (let ((ok t))
+                    (dolist (x val ok)
+                      (unless (or (stringp x) (symbolp x))
+                        (setq ok nil))))))))
   ;; org文件夹路径
   (eon-treesit-enable 'org)
   (eon-set-org-directory)
@@ -199,6 +221,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (setq org-time-stamp-formats (cons "%Y-%m-%d" "%Y-%m-%d %H:%M"))
   (setq org-capture-templates (list))
   ;; (setq org-log-done-with-time nil) ;; 记录完成标签时，是否记录时间戳
+  (add-hook 'org-insert-heading-hook #'eon-org-insert-heading-add-properties-from-auto-tags 'append)
   (add-to-list
    'org-capture-templates
    `("w" "工作待办" entry (id "60d5b5e0-b803-442f-bc6d-1dc55148802c")
