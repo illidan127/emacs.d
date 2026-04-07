@@ -2,6 +2,19 @@
 
 ;;; c/c++ 代码编辑配置
 
+(defun eon-c++-indent-style ()
+  "Allman 缩进风格，匹配 .clang-format 配置：
+BreakBeforeBraces: Allman, IndentWidth: 4, IndentCaseLabels: false,
+NamespaceIndentation: None, AccessModifierOffset: -4"
+  (let ((base (alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+    `(;; NamespaceIndentation: None
+      ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
+      ;; IndentCaseLabels: false
+      ((n-p-gp "case_statement" "compound_statement" "switch_statement") parent-bol 0)
+      ;; AccessModifierOffset: -4
+      ((node-is "access_specifier") parent-bol 0)
+      ,@base)))
+
 (use-package
   clang-format
   :defer t
@@ -20,8 +33,8 @@
   ("\\.h\\'" . c++-ts-mode)
   ("\\.hpp\\'" . c++-ts-mode)
   :config
-  ;; 默认缩 进 为4空格
   (setq c-ts-mode-indent-offset 4)
+  (setq c-ts-mode-indent-style #'eon-c++-indent-style)
   (setq lsp-enable-on-type-formatting nil)
   :hook
   (c++-ts-mode . electric-pair-mode)
