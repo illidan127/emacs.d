@@ -209,7 +209,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   ;; org-latex-preview时设置背景透明
   (plist-put org-format-latex-options :background "Transparent")
   (setq org-todo-keywords
-	'((sequence "进行中(j)" "开发中(k)" "发布中(f)" "待发布(D)" "待办(d)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
+	'((sequence "进行中(j)" "开发中(k)" "发布中(f)" "待发布(d)" "待办(D)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
   (setq org-todo-keyword-faces
 	'(("待办" . "red")
 	  ("进行中" . (:foreground "#51cf66" :weight bold))
