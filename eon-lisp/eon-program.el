@@ -69,6 +69,8 @@
   :hook
   (flycheck-mode . flyover-mode))
 
-(use-package agent-shell)
+(use-package agent-shell
+  :config
+  (setq agent-shell-cursor-acp-command `("cursor-agent" "--api-key" ,eon-cursor-api-key "acp")))
 
 (provide 'eon-program)

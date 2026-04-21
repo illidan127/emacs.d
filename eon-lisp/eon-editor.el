@@ -118,6 +118,9 @@
   :config
   (let ((temp-dir (file-name-as-directory (expand-file-name "~/temp/"))))
     (add-to-list 'auto-mode-alist
+                 (cons (concat "\\`" (regexp-quote temp-dir) "temp\\'")
+                       'text-mode))
+    (add-to-list 'auto-mode-alist
                  (cons (concat "\\`" (regexp-quote temp-dir) "temp.*\\'")
                        'text-mode)))
   :bind ("<f1>" . temporary-persistent-switch-buffer))
