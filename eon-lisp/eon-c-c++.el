@@ -18,6 +18,10 @@ NamespaceIndentation: None, AccessModifierOffset: -4"
       ((node-is "access_specifier") parent-bol 0)
       ,@base)))
 
+(defun eon-c-c++-use-spaces-for-indent ()
+  "C/C++ 缩进使用空格，不使用制表符。"
+  (setq-local indent-tabs-mode nil))
+
 (use-package
   clang-format
   :defer t
@@ -40,10 +44,12 @@ NamespaceIndentation: None, AccessModifierOffset: -4"
   (setq c-ts-mode-indent-style #'eon-c++-indent-style)
   (setq lsp-enable-on-type-formatting nil)
   :hook
+  (c++-ts-mode . eon-c-c++-use-spaces-for-indent)
   (c++-ts-mode . electric-pair-mode)
   (c++-ts-mode . yas-minor-mode)
   (c++-ts-mode . lsp-deferred)
   (c++-ts-mode . treesit-fold-mode)
+  (c-ts-mode . eon-c-c++-use-spaces-for-indent)
   (c-ts-mode . electric-pair-mode)
   (c-ts-mode . yas-minor-mode)
   (c-ts-mode . lsp-deferred)
