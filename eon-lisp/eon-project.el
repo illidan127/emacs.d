@@ -9,23 +9,36 @@
 (declare-function agent-shell-status "agent-shell")
 (declare-function agent-shell--permission-pending-p "agent-shell")
 (declare-function shell-maker-busy "shell-maker")
+(declare-function eon-workspace--known-projects "eon-workspace")
+
+(defun eon-project--git-repo-p (dir)
+  (file-exists-p (expand-file-name ".git" dir)))
+
+(defun eon-project--git-repos-in-project (root)
+  "收集 ROOT 及其直接子目录中的 Git 仓库路径。"
+  (let ((root (directory-file-name (expand-file-name root)))
+        repos)
+    (when (eon-project--git-repo-p root)
+      (push root repos))
+    (dolist (dir (directory-files root t "^[^.].*" t))
+      (when (and (file-directory-p dir)
+                 (eon-project--git-repo-p dir))
+        (push dir repos)))
+    repos))
 
 (defun eon-reset-magit-repository-list ()
-  "切换项目后，重置 `magit-repository-directories'"
+  "根据 eon-workspace 已知项目列表，重置 `magit-repository-directories'。"
   (interactive)
-  (let* ((repo-dir (vc-root-dir))
-         (cur-dir (when repo-dir (file-name-directory (directory-file-name repo-dir))))
-         (work-dir (expand-file-name "work/" (getenv "HOME"))))
-    (when (and cur-dir
-               (file-in-directory-p cur-dir work-dir))
-      (if (not (string-equal (expand-file-name cur-dir) work-dir))
-	  (let ((repos (seq-filter
-			(lambda (dir)
-			  (file-exists-p (expand-file-name ".git" dir)))
-			(directory-files cur-dir t "^[^.].*" t))))
-            (setq magit-repository-directories
-		  (mapcar (lambda (dir) (cons dir 0)) repos)))
-	(setq magit-repository-directories nil)))))
+  (require 'eon-workspace)
+  (let* ((projects (eon-workspace--known-projects))
+         (repos (cl-delete-duplicates
+                 (apply #'append
+                        (mapcar #'eon-project--git-repos-in-project projects))
+                 :test #'string=)))
+    (setq magit-repository-directories
+          (if repos
+              (mapcar (lambda (dir) (cons dir 0)) repos)
+            nil))))
 
 
 (defun eon-magit-status-wrapper ()
