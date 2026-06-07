@@ -9,6 +9,8 @@
   "自定义配置组"
   :prefix "eon-")
 
+(server-start)
+
 (require 'eon-env)
 (require 'eon-secrets nil t)
 (require 'eon-lib)
@@ -20,6 +22,7 @@
 (require 'eon-dired)
 (require 'eon-yasnippet)
 (require 'eon-vcs)
+(require 'eon-magit-agent-commit)
 (require 'eon-auto-format)
 (require 'eon-editor)
 (require 'eon-autosave)

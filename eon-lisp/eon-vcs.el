@@ -4,8 +4,15 @@
 
 (require 'eon-git-util)
 
-;; 屏蔽 with-editor fails to find a suitable emacsclient 错误
-(setq-default with-editor-emacsclient-executable "emacsclient")
+;; 使用与当前 Emacs 同源的 emacsclient，避免 git 提交时 socket 不匹配
+(eval-after-load 'with-editor
+  (lambda ()
+    (setq-default with-editor-emacsclient-executable
+                  (or (with-editor-locate-emacsclient)
+                      (when (and (boundp 'invocation-directory)
+                                 invocation-directory)
+                        (expand-file-name "bin/emacsclient" invocation-directory))
+                      "emacsclient"))))
 
 (defun eon-magit-format-file (file)
   "在magit-status界面格式化对应文件"
@@ -176,8 +183,7 @@
 	  ("提交摘要" 8 eon-magit-uncommitted-changes-count nil)
 	  ("路径" 99 magit-repolist-column-path nil)))
   :init
-  (add-hook 'git-commit-setup-hook 'eon--ensure-git-user-identity-on-commit-setup 50)
-  (add-hook 'git-commit-setup-hook 'eon-insert-commit-class-wrapper 100))
+  (add-hook 'git-commit-setup-hook 'eon--ensure-git-user-identity-on-commit-setup 50))
 
 (use-package magit-lfs
   :ensure t
