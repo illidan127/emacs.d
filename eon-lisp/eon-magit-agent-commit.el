@@ -14,6 +14,8 @@
 (declare-function eon-insert-commit-class "eon-vcs")
 (declare-function git-commit-setup "git-commit")
 (declare-function magit-commit-message-buffer "magit-commit")
+(declare-function magit-commit-assert "magit-commit")
+(declare-function magit-commit-create "magit-commit")
 (declare-function magit-toplevel "magit-git")
 (declare-function shell-maker-busy "shell-maker")
 
@@ -25,11 +27,15 @@
   :group 'eon)
 
 (defcustom eon-magit-agent-commit-auto t
-  "打开 git-commit buffer 时自动向 agent-shell 请求 commit message。"
+  "Magit 创建提交（c c）时，先向 agent-shell 请求 commit message，再打开编辑 buffer。"
   :group 'eon-magit-agent-commit
   :type 'boolean)
 
 (defvar eon-magit-agent-commit--commit-buffer nil)
+(defvar eon-magit-agent-commit--draft-message nil
+  "AI 预生成的 commit message，在 COMMIT_EDITMSG 打开后写入。")
+(defvar eon-magit-agent-commit--deferred-commit nil
+  "AI 回复后执行的 Magit 提交函数。")
 (defvar eon-magit-agent-commit--pending-p nil
   "为 t 时禁止 C-c C-c 完成提交，等待 agent 回复。")
 (defvar eon-magit-agent-commit--subscription nil)
@@ -62,6 +68,66 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
 (defun eon-magit-agent-commit--reset-state ()
   (setq eon-magit-agent-commit--pending-p nil)
   (eon-magit-agent-commit--cleanup-subscription))
+
+(defun eon-magit-agent-commit--cancel-prefetch ()
+  (setq eon-magit-agent-commit--deferred-commit nil
+        eon-magit-agent-commit--draft-message nil)
+  (eon-magit-agent-commit--reset-state))
+
+(defun eon-magit-agent-commit--reuse-message-p (args)
+  (and args
+       (seq-find (lambda (arg)
+                   (and (stringp arg)
+                        (string-prefix-p "--reuse-message=" arg)))
+                 args)))
+
+(defun eon-magit-agent-commit--should-prefetch-p (args)
+  (and eon-magit-agent-commit-auto
+       (not eon-magit-agent-commit--deferred-commit)
+       (not (eon-magit-agent-commit--reuse-message-p args))
+       (condition-case nil
+           (eon-magit-agent-commit--shell-for-repo)
+         (error nil))))
+
+(defun eon-magit-agent-commit--complete-prefetch (&optional message)
+  "AI 预生成结束：保存 draft，再打开 COMMIT_EDITMSG buffer。"
+  (setq eon-magit-agent-commit--pending-p nil
+        eon-magit-agent-commit--draft-message message)
+  (when-let ((commit-fn (prog1 eon-magit-agent-commit--deferred-commit
+                          (setq eon-magit-agent-commit--deferred-commit nil))))
+    (funcall commit-fn)))
+
+(defun eon-magit-agent-commit--send-agent-request (shell &optional commit-buffer)
+  (require 'agent-shell)
+  (let ((prompt (eon-magit-agent-commit--build-prompt)))
+    (when commit-buffer
+      (setq eon-magit-agent-commit--commit-buffer commit-buffer))
+    (setq eon-magit-agent-commit--pending-p t)
+    (eon-magit-agent-commit--cleanup-subscription)
+    (setq eon-magit-agent-commit--subscription
+          (agent-shell-subscribe-to
+           :shell-buffer shell
+           :event 'turn-complete
+           :on-event (lambda (event)
+                       (eon-magit-agent-commit--on-turn-complete event shell))))
+    (agent-shell-insert :text prompt :submit t :no-focus t :shell-buffer shell)))
+
+(defun eon-magit-agent-commit--prefetch-message ()
+  "向 agent-shell 请求 commit message；完成后调用 `eon-magit-agent-commit--deferred-commit'。"
+  (let* ((root (eon-magit-agent-commit--repo-root))
+         (shell (condition-case nil
+                    (eon-magit-agent-commit--shell-for-repo root)
+                  (error nil))))
+    (unless shell
+      (message "未找到 agent-shell，跳过 AI 预生成")
+      (eon-magit-agent-commit--complete-prefetch nil)
+      (cl-return nil))
+    (when (with-current-buffer shell (shell-maker-busy))
+      (message "agent-shell 忙碌中，跳过 AI 预生成")
+      (eon-magit-agent-commit--complete-prefetch nil)
+      (cl-return nil))
+    (message "正在向 agent-shell 请求提交信息…")
+    (eon-magit-agent-commit--send-agent-request shell)))
 
 (defun eon-magit-agent-commit--repo-root ()
   (or (ignore-errors (magit-toplevel))
@@ -234,15 +300,25 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
     (eon-magit-agent-commit--cleanup-subscription)
     (if (equal stop-reason "end_turn")
         (let ((msg (eon-magit-agent-commit--last-agent-message shell-buffer)))
-          (if msg
-              (eon-magit-agent-commit--finish-ai-flow msg)
-            (progn
-              (message "Agent 回复为空，请选择 commit-class 后手动编写")
-              (eon-magit-agent-commit--finish-ai-flow nil))))
-      (progn
-        (message "Agent 未完成回复（%s）" (or stop-reason "unknown"))
-        (setq eon-magit-agent-commit--pending-p nil)
-        (eon-magit-agent-commit--run-commit-class)))))
+          (if eon-magit-agent-commit--deferred-commit
+              (progn
+                (unless msg
+                  (message "Agent 回复为空，将打开空白提交 buffer"))
+                (eon-magit-agent-commit--complete-prefetch msg))
+            (if msg
+                (eon-magit-agent-commit--finish-ai-flow msg)
+              (progn
+                (message "Agent 回复为空，请选择 commit-class 后手动编写")
+                (eon-magit-agent-commit--finish-ai-flow nil)))))
+      (if eon-magit-agent-commit--deferred-commit
+          (progn
+            (message "Agent 未完成回复（%s），将打开空白提交 buffer"
+                     (or stop-reason "unknown"))
+            (eon-magit-agent-commit--complete-prefetch nil))
+        (progn
+          (message "Agent 未完成回复（%s）" (or stop-reason "unknown"))
+          (setq eon-magit-agent-commit--pending-p nil)
+          (eon-magit-agent-commit--run-commit-class))))))
 
 (defun eon-magit-agent-commit--finish-query (force)
   "等待 agent 生成提交信息期间阻止 C-c C-c。"
@@ -257,63 +333,40 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
   (interactive)
   (unless (eon-magit-agent-commit--commit-buffer-p)
     (user-error "请在 Git 提交 message buffer 中使用"))
-  (require 'agent-shell)
   (let* ((root (eon-magit-agent-commit--repo-root))
-         (shell (eon-magit-agent-commit--shell-for-repo root))
-         (prompt (eon-magit-agent-commit--build-prompt)))
+         (shell (eon-magit-agent-commit--shell-for-repo root)))
     (unless shell
-      (setq eon-magit-agent-commit--pending-p nil)
       (user-error "未找到仓库 %s 对应的 agent-shell，请先在工作区启动 agent"
                   (or root default-directory)))
     (when (with-current-buffer shell (shell-maker-busy))
       (user-error "agent-shell 忙碌中，请稍后再试"))
-    (setq eon-magit-agent-commit--commit-buffer (current-buffer)
-          eon-magit-agent-commit--pending-p t)
-    (eon-magit-agent-commit--cleanup-subscription)
-    (setq eon-magit-agent-commit--subscription
-          (agent-shell-subscribe-to
-           :shell-buffer shell
-           :event 'turn-complete
-           :on-event (lambda (event)
-                       (eon-magit-agent-commit--on-turn-complete event shell))))
     (message "已向 agent-shell 请求提交信息…")
-    (agent-shell-insert :text prompt :submit t :no-focus t :shell-buffer shell)))
+    (eon-magit-agent-commit--send-agent-request shell (current-buffer))))
 
-(defun eon-magit-agent-commit--start-after-buffer-ready ()
-  "提交 buffer 就绪后：先 AI 生成 message，再 commit-class。"
-  (when (eon-magit-agent-commit--commit-buffer-p)
-    (setq eon-magit-agent-commit--commit-buffer (current-buffer))
-    (let ((shell (condition-case nil
-                     (eon-magit-agent-commit--shell-for-repo)
-                   (error nil))))
-      (if shell
-          (condition-case err
-              (eon-magit-agent-commit-request)
-            (error
-             (setq eon-magit-agent-commit--pending-p nil)
-             (message "AI 提交信息请求失败：%s" (error-message-string err))
-             (eon-magit-agent-commit--run-commit-class)))
-        (message "未找到 agent-shell（仓库 %s），仅选择 commit-class"
-                 (or (eon-magit-agent-commit--repo-root) default-directory))
-        (eon-magit-agent-commit--run-commit-class)))))
+(defun eon-magit-agent-commit--magit-commit-create (orig &optional args)
+  "先 AI 预生成提交信息，再调用 `magit-commit-create' 打开 COMMIT_EDITMSG。"
+  (if (eon-magit-agent-commit--should-prefetch-p args)
+      (let ((default-directory (magit-toplevel)))
+        (unless (setq args (magit-commit-assert args))
+          (cl-return-from eon-magit-agent-commit--magit-commit-create nil))
+        (setq eon-magit-agent-commit--deferred-commit
+              (lambda () (funcall orig args)))
+        (eon-magit-agent-commit--prefetch-message))
+    (funcall orig args)))
 
 (defun eon-magit-agent-commit--setup ()
-  "git-commit-setup-hook：仅调度异步任务，避免在 hook 内调用 ivy/agent-shell。"
+  "git-commit-setup-hook：写入预生成的 message，再选择 commit-class。"
   (when (eon-magit-agent-commit--commit-buffer-p)
-    (eon-magit-agent-commit--reset-state)
     (setq eon-magit-agent-commit--commit-buffer (current-buffer))
-    (if eon-magit-agent-commit-auto
-        (let ((buf (current-buffer)))
-          (run-at-time 0 nil
-                       (lambda ()
-                         (when (buffer-live-p buf)
-                           (with-current-buffer buf
-                             (eon-magit-agent-commit--start-after-buffer-ready))))))
-      (let ((buf (current-buffer)))
-        (run-at-time 0 nil
-                     (lambda ()
-                       (when (buffer-live-p buf)
-                         (with-current-buffer buf
+    (let ((buf (current-buffer))
+          (draft eon-magit-agent-commit--draft-message))
+      (setq eon-magit-agent-commit--draft-message nil)
+      (run-at-time 0 nil
+                   (lambda ()
+                     (when (buffer-live-p buf)
+                       (with-current-buffer buf
+                         (if draft
+                             (eon-magit-agent-commit--finish-ai-flow draft)
                            (eon-magit-agent-commit--run-commit-class)))))))))
 
 (defun eon-magit-agent-commit--register ()
@@ -327,22 +380,23 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
   (remove-hook 'git-commit-setup-hook #'eon-magit-agent-commit--setup-auto)
   (remove-hook 'git-commit-finish-query-functions
                 #'eon-magit-agent-commit--finish-query)
+  (advice-remove 'magit-commit-create #'eon-magit-agent-commit--magit-commit-create)
   (define-key git-commit-mode-map (kbd "C-c C-a")
               #'eon-magit-agent-commit-request)
   (add-hook 'with-editor-filter-visit-hook
             #'eon-magit-agent-commit--ensure-git-commit-setup)
   (add-hook 'git-commit-setup-hook #'eon-magit-agent-commit--setup 95)
   (add-hook 'git-commit-finish-query-functions
-            #'eon-magit-agent-commit--finish-query))
+            #'eon-magit-agent-commit--finish-query)
+  (advice-add 'magit-commit-create :around #'eon-magit-agent-commit--magit-commit-create))
 
-(with-eval-after-load 'with-editor
-  (add-hook 'with-editor-filter-visit-hook
-            #'eon-magit-agent-commit--ensure-git-commit-setup))
+(with-eval-after-load 'magit-commit
+  (eon-magit-agent-commit--register))
 
 (with-eval-after-load 'git-commit
   (eon-magit-agent-commit--register))
 
-(when (featurep 'git-commit)
+(when (and (featurep 'magit-commit) (featurep 'git-commit))
   (eon-magit-agent-commit--register))
 
 (provide 'eon-magit-agent-commit)
