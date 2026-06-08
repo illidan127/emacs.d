@@ -483,4 +483,65 @@
       (magit-run-git "tag" tag-name)
       (message "创建TAG: %s" tag-name))))
 
+(defun eon-magit-repo-tag-info--read-repo (default)
+  "选择git仓库目录，默认使用 DEFAULT。"
+  (require 'eon-workspace)
+  (let* ((projects (eon-workspace--known-projects))
+         (pairs (when projects (eon-workspace--project-display-pairs projects)))
+         (choices (mapcar #'car pairs)))
+    (if (not choices)
+        (read-directory-name "选择仓库: " default nil t)
+      (let* ((default-pair (cl-find default pairs :test #'string= :key #'cdr))
+             (default-display (if default-pair (car default-pair) (car choices)))
+             (selected (completing-read "选择工作区: " choices nil t nil nil default-display)))
+        (cdr (assoc-string selected pairs))))))
+
+(defun eon-magit-repo-tag-info--repo-urls (default-directory)
+  "Return (commit-url-base . author-url-base) for the repo at DEFAULT-DIRECTORY."
+  (let* ((info (ignore-errors (eon-git-util-repo-info)))
+         (host (and info (funcall info 'host)))
+         (name (and info (string-remove-suffix ".git" (funcall info 'name)))))
+    (when (and host name)
+      (cons (format "https://%s/%s/commit/" host name)
+            (format "https://%s/" host)))))
+
+(defun eon-magit-repo-tag-info ()
+  "对比两个tag之间的提交变更信息"
+  (interactive)
+  (let* ((current-repo (or (ignore-errors (magit-toplevel)) default-directory))
+         (repo (eon-magit-repo-tag-info--read-repo current-repo))
+         (default-directory repo))
+    (magit-run-git "fetch" "--tags" "--force")
+    (let* ((tags (magit-list-tags))
+           (sorted-tags (sort tags #'string<)))
+      (unless sorted-tags
+        (user-error "该仓库没有tag"))
+      (let* ((old-tag (completing-read "旧tag: " sorted-tags nil t))
+             (rest (cdr (member old-tag sorted-tags)))
+             (new-tag (completing-read "新tag: " rest nil t))
+             (range (format "%s..%s" old-tag new-tag))
+             (urls (eon-magit-repo-tag-info--repo-urls repo))
+             (log-output (shell-command-to-string
+                          (format "git log --format=\"%%h%%x09%%s%%x09%%an\" %s" range)))
+             (buf (get-buffer-create "*eon-tag-diff*")))
+        (with-current-buffer buf
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert (format "# 提交变更: `%s`\n\n" range))
+            (if (string-empty-p (string-trim log-output))
+                (insert "*无提交记录*\n")
+              (dolist (line (split-string log-output "\n" t))
+                (let ((parts (split-string line "\t")))
+                  (when (>= (length parts) 3)
+                    (cl-destructuring-bind (hash subject author) parts
+                      (if urls
+                          (insert (format "- [`%s`](%s%s) %s — [%s](%s%s)\n"
+                                          hash (car urls) hash
+                                          subject
+                                          author (cdr urls) author))
+                        (insert (format "- `%s` %s — %s\n"
+                                        hash subject author))))))))
+            (goto-char (point-min))
+            (markdown-mode)))
+        (pop-to-buffer buf)))))
 (provide 'eon-vcs)
