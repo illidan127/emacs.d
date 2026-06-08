@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
+(require 'cl-lib)
+
 (use-package package-build
   :init
   (setq package-build-recipes-dir (expand-file-name "recipes" user-emacs-directory))
@@ -56,5 +58,98 @@
                           (when (file-exists-p pkg-dir)
                             (delete-directory pkg-dir t))
                           (eon-elpa--build-one recipe t))))))
+
+(defun eon-elpa--remote-archive-dir-p (dir)
+  "判断 DIR 是否为远程 package archive 路径。"
+  (and (stringp dir)
+       (or (string-prefix-p "http://" dir)
+           (string-prefix-p "https://" dir)
+           (string-prefix-p "ftp://" dir))))
+
+(defun eon-elpa--read-archive-contents ()
+  "读取 eon-elpa/archive-contents 中的包列表。"
+  (let ((file (expand-file-name "archive-contents" package-build-archive-dir)))
+    (when (file-exists-p file)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (cdr (read (current-buffer)))))))
+
+(defun eon-elpa--archive-version (pkg)
+  "返回 PKG 在 eon-elpa archive 中的版本，不存在则返回 nil。"
+  (when-let ((entry (assq pkg (eon-elpa--read-archive-contents))))
+    (aref (cdr entry) 0)))
+
+(defun eon-elpa--package-allowed-p (pkg desc)
+  "判断 PKG 是否允许安装（builtin 或在 eon-elpa archive 中）。"
+  (or (eq (package-desc-archive desc) 'builtin)
+      (package-built-in-p pkg)
+      (assq pkg (eon-elpa--read-archive-contents))))
+
+(defun eon-elpa--sanitize-package-archives ()
+  "移除 package-archives 中的远程源，仅保留本地 eon-elpa。"
+  (setq package-archives
+        (cl-remove-if (lambda (archive)
+                        (eon-elpa--remote-archive-dir-p (cdr archive)))
+                      package-archives)))
+
+(defun eon-elpa--harden-package-sources ()
+  "加固 package 安装源，禁止从网络下载或注册远程 archive。"
+  (eon-elpa--sanitize-package-archives))
+
+(define-advice package-download-transaction
+    (:around (fn &rest args) eon-elpa-block-package-download)
+  (error "禁止从网络下载包，请先在 eon-elpa 中构建：%s" (car args)))
+
+(define-advice package-refresh-contents
+    (:around (fn &optional async) eon-elpa-package-refresh-contents)
+  (let ((remotes (cl-remove-if (lambda (archive)
+                                 (not (eon-elpa--remote-archive-dir-p (cdr archive))))
+                               package-archives)))
+    (when remotes
+      (error "禁止刷新远程 package archive: %s"
+             (mapconcat (lambda (archive) (car archive)) remotes ", "))))
+  (funcall fn async))
+
+(define-advice add-to-list
+    (:before (var val &optional _append) eon-elpa-block-remote-archive)
+  (when (eq var 'package-archives)
+    (let ((dir (cdr-safe val)))
+      (when (eon-elpa--remote-archive-dir-p dir)
+        (error "禁止添加远程 package archive: %s" dir)))))
+
+(defun eon-elpa-audit-installed-packages ()
+  "审计已安装包来源，列出来自非 eon-elpa 且非 builtin 的包。"
+  (interactive)
+  (let ((violations nil)
+        (version-mismatches nil))
+    (dolist (entry (package--alist))
+      (let* ((pkg (car entry))
+             (name (symbol-name pkg))
+             (desc (cadr entry))
+             (archive (package-desc-archive desc))
+             (archive-version (eon-elpa--archive-version pkg))
+             (installed-version (package-desc-version desc)))
+        (if (not (eon-elpa--package-allowed-p pkg desc))
+            (push (cons name (or archive 'unknown)) violations)
+          (when (and archive-version
+                     (not (version-list-= installed-version archive-version)))
+            (push (list name installed-version archive-version)
+                  version-mismatches)))))
+    (setq violations (nreverse violations)
+          version-mismatches (nreverse version-mismatches))
+    (if violations
+        (progn
+          (message "发现 %d 个非本地源包:" (length violations))
+          (dolist (v violations)
+            (message "  %s <- %s" (car v) (cdr v))))
+      (message "审计通过：所有已安装包均在 eon-elpa archive 或为 builtin"))
+    (when version-mismatches
+      (message "发现 %d 个版本与 eon-elpa 不一致:" (length version-mismatches))
+      (dolist (v version-mismatches)
+        (message "  %s: 已安装 %s, archive %s"
+                 (nth 0 v) (version-to-string (nth 1 v)) (version-to-string (nth 2 v)))))
+    (list :violations violations :version-mismatches version-mismatches)))
+
+(eon-elpa--harden-package-sources)
 
 (provide 'eon-elpa)

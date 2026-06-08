@@ -13,7 +13,7 @@
 (let ((eon-elpa (expand-file-name "eon-elpa" user-emacs-directory)))
   (when (file-exists-p (expand-file-name "archive-contents" eon-elpa))
     (add-to-list 'package-archives `("eon-elpa/" . ,eon-elpa))
-    (setq package-archive-priorities '(("eon-elpa" . 1000)))))
+    (setq package-archive-priorities '(("eon-elpa/" . 1000)))))
 
 ;; 在更新包列表前，先刷新一下自建仓库
 ;; (define-advice package-refresh-contents (:before (&optional async) eon-package-refresh-contents)
