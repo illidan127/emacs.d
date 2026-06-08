@@ -27,7 +27,7 @@
 (use-package smex)
 
 (use-package counsel
-  :ensure nil
+  :diminish
   :bind
   (:map global-map
 	("C-h f" . counsel-describe-function)

@@ -1,7 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
-(require 'modalka)
-(diminish 'modalka-mode)
+(use-package modalka :diminish)
+;; (diminish 'modalka-mode)
 (require 'eon-modalka-keys)
 
 ;; (add-to-list 'modalka-excluded-modes 'magit-status-mode) ;; 排除 modalka 模式的情形
