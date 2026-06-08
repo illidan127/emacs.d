@@ -4,6 +4,9 @@
 
 (require 'eon-git-util)
 
+(defvar-local eon-magit-repolist-tag-selections nil
+  "Hash table mapping repo path to (old-tag . new-tag).")
+
 ;; 使用与当前 Emacs 同源的 emacsclient，避免 git 提交时 socket 不匹配
 (eval-after-load 'with-editor
   (lambda ()
@@ -173,6 +176,8 @@
   (define-key magit-diff-mode-map (kbd "C-w") nil)
   (define-key magit-log-mode-map (kbd "C-w") nil)
   (define-key magit-process-mode-map (kbd "C-w") nil)
+  (define-key magit-repolist-mode-map (kbd "T") #'eon-magit-repolist-tag-select)
+  (define-key magit-repolist-mode-map (kbd "X") #'eon-magit-repolist-tag-summary)
 
   ;; 设置仓库列表的显示列
   (setq magit-repolist-columns
@@ -181,6 +186,7 @@
 	   ((:sort magit-repolist-version<)))
 	  ("分支数" 8 magit-repolist-column-branches nil)
 	  ("提交摘要" 8 eon-magit-uncommitted-changes-count nil)
+	  ("Tag对比" 25 eon-magit-repolist-column-tag-range nil)
 	  ("路径" 99 magit-repolist-column-path nil)))
   :init
   (add-hook 'git-commit-setup-hook 'eon--ensure-git-user-identity-on-commit-setup 50))
@@ -215,6 +221,13 @@
 	 (unpulled (and-let* ((br (magit-get-upstream-branch)))
 		     (cadr (magit-rev-diff-count "HEAD" br)))))
     (format "%d/%d/%d" uncommitted (or unpushed 0) (or unpulled 0))))
+
+(defun eon-magit-repolist-column-tag-range (spec)
+  "Display the selected tag range for the repo at SPEC."
+  (if-let ((sel (and eon-magit-repolist-tag-selections
+                      (gethash spec eon-magit-repolist-tag-selections))))
+      (format "%s..%s" (car sel) (cdr sel))
+    ""))
 
 ;;;###autoload
 (transient-define-prefix eon-magit-commit ()
@@ -505,43 +518,220 @@
       (cons (format "https://%s/%s/commit/" host name)
             (format "https://%s/" host)))))
 
+(defun eon-magit-repo-tag-info--prompt-tags (repo-label sorted-tags old-def new-def)
+  "Prompt for old and new tags from SORTED-TAGS, with defaults.
+Returns (old-tag new-tag) or nil if user cancels."
+  (let* ((old-tag (completing-read
+                   (format "[%s] 旧tag: " repo-label)
+                   sorted-tags nil t nil nil old-def))
+         (rest (cdr (member old-tag sorted-tags)))
+         (new-tag (completing-read
+                   (format "[%s] 新tag: " repo-label)
+                   rest nil t nil nil new-def)))
+    (list old-tag new-tag)))
+
+(defun eon-magit-repo-tag-info--collect (repo &optional old-def new-def)
+  "Fetch and collect tag diff data for REPO.
+Returns plist or nil if user cancels or repo has no tags."
+  (let ((default-directory (file-name-as-directory (expand-file-name repo)))
+        (repo-label (file-name-nondirectory (directory-file-name repo))))
+    (magit-call-git "fetch" "--tags" "--force")
+    (let* ((sorted-tags (sort (magit-list-tags) #'string<)))
+      (unless sorted-tags
+        (message "[%s] 没有 tag，跳过" repo-label)
+        (cl-return-from eon-magit-repo-tag-info--collect nil))
+      (let* ((tag-result
+              (condition-case nil
+                  (eon-magit-repo-tag-info--prompt-tags repo-label sorted-tags old-def new-def)
+                (quit nil)))
+             (old-tag (car tag-result))
+             (new-tag (cadr tag-result)))
+        (when (and old-tag new-tag)
+          (let* ((range (format "%s..%s" old-tag new-tag))
+                 (urls (eon-magit-repo-tag-info--repo-urls default-directory))
+                 (log-output (shell-command-to-string
+                              (format "git log --format=\"%%h%%x09%%s%%x09%%an\" %s" range))))
+            (list :repo repo :repo-label repo-label
+                  :range range :urls urls :log log-output
+                  :old-tag old-tag :new-tag new-tag)))))))
+
+(defun eon-magit-repo-tag-info--format-commits (results)
+  "Format RESULTS into markdown string for buffer insertion."
+  (with-temp-buffer
+    (dolist (r results)
+      (let ((range (plist-get r :range))
+            (urls (plist-get r :urls))
+            (log-output (plist-get r :log)))
+        (if (= (length results) 1)
+            (insert (format "# 提交变更: `%s`\n\n" range))
+          (insert (format "## %s\n\n" (plist-get r :repo-label)))
+          (insert (format "变更范围: `%s`\n\n" range)))
+        (if (string-empty-p (string-trim log-output))
+            (insert "*无提交记录*\n\n")
+          (dolist (line (split-string log-output "\n" t))
+            (let ((parts (split-string line "\t")))
+              (when (>= (length parts) 3)
+                (cl-destructuring-bind (hash subject author) parts
+                  (if urls
+                      (insert (format "- [`%s`](%s%s) %s — [%s](%s%s)\n"
+                                      hash (car urls) hash subject
+                                      author (cdr urls) author))
+                    (insert (format "- `%s` %s — %s\n"
+                                    hash subject author))))))))
+        (insert "\n")))
+    (buffer-string)))
+
+(defun eon-magit-repo-tag-info--display (results)
+  "Display RESULTS in buffer *eon-tag-diff*."
+  (let ((buf (get-buffer-create "*eon-tag-diff*")))
+    (with-current-buffer buf
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert (eon-magit-repo-tag-info--format-commits results))
+        (goto-char (point-min))
+        (markdown-mode)))
+    (pop-to-buffer buf)))
+
+(defun eon-magit-repo-tag-info--get-repos (&optional char)
+  "Return marked repositories or `all' if none are marked."
+  (or (magit-repolist--marked-repos char)
+      (if (magit-confirm 'repolist-all
+            "没有标记仓库。是否对所有仓库执行？")
+          'all
+        (user-error "Abort"))))
+
+(defun eon-magit-repo-tag-info--all-repos ()
+  "Return all repos displayed in the current repolist buffer."
+  (let (repos)
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (push (tabulated-list-get-id) repos)
+        (forward-line)))
+    (nreverse repos)))
+
+(defun eon-magit-repolist--save-marks ()
+  "Return a list of (repo . mark-char) for all marked repos in the repolist buffer."
+  (let (marks)
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (let ((c (char-after)))
+          (unless (eq c ?\s)
+            (push (cons (tabulated-list-get-id) c) marks)))
+        (forward-line)))
+    marks))
+
+(defun eon-magit-repolist--restore-marks (marks)
+  "Restore MARKS in the current repolist buffer without moving point."
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (when-let ((m (assoc (tabulated-list-get-id) marks #'string=)))
+        (tabulated-list-put-tag (cdr m) nil))
+      (forward-line))))
+(defun eon-magit-repolist--ensure-selections ()
+  "Initialize `eon-magit-repolist-tag-selections' if needed."
+  (unless eon-magit-repolist-tag-selections
+    (setq eon-magit-repolist-tag-selections (make-hash-table :test 'equal))))
+
+(defun eon-magit-repolist-tag-select ()
+  "为光标所在已标记仓库选择新旧tag。
+光标必须在已标记（m）的仓库行上。可重复按 T 修改选择。"
+  (interactive)
+  (eon-magit-repolist--ensure-selections)
+  (unless (eq (char-after) ?*)
+    (user-error "光标不在已标记仓库上，请先按 m 标记"))
+  (let* ((repo (tabulated-list-get-id))
+         (default-directory (file-name-as-directory (expand-file-name repo)))
+         (repo-label (file-name-nondirectory (directory-file-name repo)))
+         (prev (gethash repo eon-magit-repolist-tag-selections)))
+    (magit-call-git "fetch" "--tags" "--force")
+    (let* ((sorted-tags (sort (magit-list-tags) #'string<)))
+      (unless sorted-tags
+        (user-error "[%s] 没有 tag" repo-label))
+      (let* ((old-def (car prev))
+             (new-def (cdr prev))
+             (old-tag (completing-read
+                       (format "[%s] 旧tag: " repo-label)
+                       sorted-tags nil t nil nil old-def))
+             (rest (cdr (member old-tag sorted-tags)))
+             (new-tag (completing-read
+                       (format "[%s] 新tag: " repo-label)
+                       rest nil t nil nil new-def)))
+        (puthash repo (cons old-tag new-tag) eon-magit-repolist-tag-selections)
+        (message "[%s] %s..%s" repo-label old-tag new-tag)))))
+
+(defun eon-magit-repolist-tag-summary ()
+  "为所有已标记仓库生成tag变更摘要。
+若某仓库未选择tag，则提示用户选择。"
+  (interactive)
+  (eon-magit-repolist--ensure-selections)
+  (let ((marked (magit-repolist--marked-repos ?*)))
+    (unless marked
+      (user-error "没有已标记的仓库，请先按 m 标记"))
+    (let ((results nil))
+      (dolist (repo marked)
+        (let ((sel (gethash repo eon-magit-repolist-tag-selections)))
+          (unless sel
+            (let* ((repo-label (file-name-nondirectory (directory-file-name repo)))
+                   (result (condition-case nil
+                               (let ((default-directory
+                                       (file-name-as-directory (expand-file-name repo))))
+                                 (magit-call-git "fetch" "--tags" "--force")
+                                 (let* ((sorted-tags (sort (magit-list-tags) #'string<)))
+                                   (if sorted-tags
+                                       (let* ((old-tag (completing-read
+                                                        (format "[%s] 旧tag: " repo-label)
+                                                        sorted-tags nil t))
+                                              (rest (cdr (member old-tag sorted-tags)))
+                                              (new-tag (completing-read
+                                                        (format "[%s] 新tag: " repo-label)
+                                                        rest nil t)))
+                                         (puthash repo (cons old-tag new-tag)
+                                                  eon-magit-repolist-tag-selections)
+                                         (cons old-tag new-tag))
+                                     (message "[%s] 没有 tag，跳过" repo-label))))
+                             (quit nil))))
+              (setq sel result)))
+          (when sel
+            (let* ((default-directory (file-name-as-directory (expand-file-name repo)))
+                   (old-tag (car sel))
+                   (new-tag (cdr sel))
+                   (range (format "%s..%s" old-tag new-tag))
+                   (urls (eon-magit-repo-tag-info--repo-urls default-directory))
+                   (log-output (shell-command-to-string
+                                (format "git log --format=\"%%h%%x09%%s%%x09%%an\" %s" range)))
+                   (repo-label (file-name-nondirectory (directory-file-name repo))))
+              (push (list :repo repo :repo-label repo-label
+                          :range range :urls urls :log log-output)
+                    results)))))
+      (when results
+        (eon-magit-repo-tag-info--display (nreverse results))))))
+
+(defun eon-magit-repolist-tag-info (repos)
+  "对标记的仓库逐一对比tag间的提交变更，旧/新tag默认值沿用上一个仓库的选择。"
+  (interactive (list (eon-magit-repo-tag-info--get-repos ?*)))
+  (when (eq repos 'all)
+    (setq repos (eon-magit-repo-tag-info--all-repos)))
+  (let ((results nil)
+        (prev-old nil)
+        (prev-new nil))
+    (dolist (repo repos)
+      (let ((result (eon-magit-repo-tag-info--collect repo prev-old prev-new)))
+        (when result
+          (push result results)
+          (setq prev-old (plist-get result :old-tag)
+                prev-new (plist-get result :new-tag)))))
+    (when results
+      (eon-magit-repo-tag-info--display (nreverse results)))))
+
 (defun eon-magit-repo-tag-info ()
   "对比两个tag之间的提交变更信息"
   (interactive)
   (let* ((current-repo (or (ignore-errors (magit-toplevel)) default-directory))
          (repo (eon-magit-repo-tag-info--read-repo current-repo))
-         (default-directory repo))
-    (magit-run-git "fetch" "--tags" "--force")
-    (let* ((tags (magit-list-tags))
-           (sorted-tags (sort tags #'string<)))
-      (unless sorted-tags
-        (user-error "该仓库没有tag"))
-      (let* ((old-tag (completing-read "旧tag: " sorted-tags nil t))
-             (rest (cdr (member old-tag sorted-tags)))
-             (new-tag (completing-read "新tag: " rest nil t))
-             (range (format "%s..%s" old-tag new-tag))
-             (urls (eon-magit-repo-tag-info--repo-urls repo))
-             (log-output (shell-command-to-string
-                          (format "git log --format=\"%%h%%x09%%s%%x09%%an\" %s" range)))
-             (buf (get-buffer-create "*eon-tag-diff*")))
-        (with-current-buffer buf
-          (let ((inhibit-read-only t))
-            (erase-buffer)
-            (insert (format "# 提交变更: `%s`\n\n" range))
-            (if (string-empty-p (string-trim log-output))
-                (insert "*无提交记录*\n")
-              (dolist (line (split-string log-output "\n" t))
-                (let ((parts (split-string line "\t")))
-                  (when (>= (length parts) 3)
-                    (cl-destructuring-bind (hash subject author) parts
-                      (if urls
-                          (insert (format "- [`%s`](%s%s) %s — [%s](%s%s)\n"
-                                          hash (car urls) hash
-                                          subject
-                                          author (cdr urls) author))
-                        (insert (format "- `%s` %s — %s\n"
-                                        hash subject author))))))))
-            (goto-char (point-min))
-            (markdown-mode)))
-        (pop-to-buffer buf)))))
+         (result (eon-magit-repo-tag-info--collect repo)))
+    (when result
+      (eon-magit-repo-tag-info--display (list result)))))
 (provide 'eon-vcs)
