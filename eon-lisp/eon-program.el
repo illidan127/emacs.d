@@ -85,6 +85,11 @@
   )
 
 (use-package ghostel
+  :defer t
+  :commands (ghostel ghostel-project ghostel-other ghostel-next ghostel-previous
+               ghostel-list-buffers)
+  :init
+  (setq ghostel-module-auto-install 'download)
   :config
   (defun eon-ghostel-escape-from-char ()
     "Exit ghostel char mode, enter emacs mode, and activate modalka."
