@@ -176,7 +176,7 @@
   "Org Agenda 命令（替代 *Agenda Commands* buffer）"
   [["Agenda"
     ("a" "本周/本日" eon-org-agenda--a)
-    ("n" "全部 agenda+TODO" eon-org-agenda--n)
+    ("n" "全部 agenda+TODO" eon-org-agenda--t)
     ("t" "全部 TODO" eon-org-agenda--t)
     ("T" "指定 TODO 关键字" eon-org-agenda--T)]
    ["查询"
