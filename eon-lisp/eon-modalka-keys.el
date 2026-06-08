@@ -90,7 +90,7 @@
   (let ((realkey
 	 (pcase major-mode
 	   ('magit-status-mode (eon-magit-key-infer "f"))
-	   ('magit-repolist-mode #'magit-repolist-fetch)
+	   ('magit-repolist-mode #'eon-magit-repolist-fetch-at-point)
 	   ('ivy-occur-grep-mode #'ivy-occur-press)
 	   ('ivy-occur-mode #'ivy-occur-press)
 	   (_ "C-f"))))

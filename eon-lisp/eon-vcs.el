@@ -426,6 +426,14 @@
 	   (url (format "https://%s/%s" (funcall info 'host) (funcall info 'name))))
       (browse-url url))))
 
+(defun eon-magit-repolist-fetch-at-point ()
+  "Fetch the repository at point."
+  (interactive)
+  (when-let ((repo (tabulated-list-get-id)))
+    (run-hooks 'magit-credential-hook)
+    (let ((default-directory (file-name-as-directory (expand-file-name repo))))
+      (magit-run-git "remote" "update"))))
+
 (defun eon-magit-repolist-open-git-http ()
   "打开当前仓库"
   (interactive)
