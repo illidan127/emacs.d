@@ -48,7 +48,7 @@
 (global-hl-line-mode 1)
 
 ;; 放大整体字体
-(face-spec-set 'default `((t (:height 144))))
+;; (face-spec-set 'default `((t (:height 144))))
 
 ;; 启动最大化
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
