@@ -88,9 +88,11 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
   (and eon-magit-agent-commit-auto
        (not eon-magit-agent-commit--deferred-commit)
        (not (eon-magit-agent-commit--reuse-message-p args))
-       (condition-case nil
+       (and (fboundp 'eon-workspace-current)
+            (eon-workspace-current))
+       (condition-case err
            (eon-magit-agent-commit--shell-for-repo)
-         (error nil))))
+         (error (signal (car err) (cdr err))))))
 
 (defun eon-magit-agent-commit--complete-prefetch (&optional message)
   "AI 预生成结束：保存 draft，再打开 COMMIT_EDITMSG buffer。"
@@ -151,7 +153,10 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
       (eon-magit-agent-commit--normalize-dir (agent-shell-cwd)))))
 
 (defun eon-magit-agent-commit--shell-for-repo (&optional root)
-  "返回与 ROOT（或当前仓库）匹配的 agent-shell buffer。"
+  "返回与 ROOT（或当前仓库）匹配的 agent-shell buffer。
+
+若当前处于工作区窗口中，则强制要求 agent-shell 的 cwd 与仓库根目录
+一致，否则报错中止。非工作区窗口则沿用宽松匹配策略。"
   (require 'agent-shell)
   (let* ((root (eon-magit-agent-commit--normalize-dir
                 (or root (eon-magit-agent-commit--repo-root))))
@@ -160,24 +165,29 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
                   (seq-find (lambda (buf)
                               (equal root (eon-magit-agent-commit--shell-cwd buf)))
                             shells)))
-         (nested (when root
-                   (seq-find
-                    (lambda (buf)
-                      (let ((cwd (eon-magit-agent-commit--shell-cwd buf)))
-                        (when cwd
-                          (or (string-prefix-p cwd root)
-                              (string-prefix-p root cwd)))))
-                    shells))))
-    (or exact
-        (when (fboundp 'agent-shell-project-buffers)
-          (let ((default-directory (or root default-directory)))
-            (seq-first (agent-shell-project-buffers))))
-        nested
-        (when (and eon-magit-agent-commit-auto shells)
-          (car shells))
-        (when root
-          (let ((default-directory root))
-            (agent-shell--shell-buffer :no-create t :no-error t))))))
+         (in-workspace (and (fboundp 'eon-workspace-current)
+                            (eon-workspace-current))))
+    (if in-workspace
+        (or exact
+            (user-error "当前工作区未找到仓库 %s 对应的 agent-shell，请先用 F8 打开工作区并在其中启动 agent"
+                        root))
+      (or exact
+          (when (fboundp 'agent-shell-project-buffers)
+            (let ((default-directory (or root default-directory)))
+              (seq-first (agent-shell-project-buffers))))
+          (when root
+            (seq-find
+             (lambda (buf)
+               (let ((cwd (eon-magit-agent-commit--shell-cwd buf)))
+                 (when cwd
+                   (or (string-prefix-p cwd root)
+                       (string-prefix-p root cwd)))))
+             shells))
+          (when (and eon-magit-agent-commit-auto shells)
+            (car shells))
+          (when root
+            (let ((default-directory root))
+              (agent-shell--shell-buffer :no-create t :no-error t)))))))
 
 (defun eon-magit-agent-commit--staged-diff ()
   (let ((default-directory (or (eon-magit-agent-commit--repo-root) default-directory)))
