@@ -1,8 +1,9 @@
 ;; -*- lexical-binding: t; -*-
 
-(use-package protobuf-mode
+(use-package protobuf-ts-mode
   :init
   (eon-treesit-enable 'cpp)
+  (eon-treesit-enable 'proto)
   (add-to-list 'eon-treesit-fold-modes 'protobuf-ts-mode)
   :mode
   ("\\.proto\\'" . protobuf-ts-mode)

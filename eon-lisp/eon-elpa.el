@@ -98,7 +98,14 @@
 
 (define-advice package-download-transaction
     (:around (fn &rest args) eon-elpa-block-package-download)
-  (error "禁止从网络下载包，请先在 eon-elpa 中构建：%s" (car args)))
+  (let ((pkgs (car args)))
+    (dolist (pkg pkgs)
+      (when-let* ((archive-name (package-desc-archive pkg))
+                  (archive-dir (cdr (assoc archive-name package-archives)))
+                  ((eon-elpa--remote-archive-dir-p archive-dir)))
+        (error "禁止从远程源下载包 %s: %s"
+               (package-desc-name pkg) archive-name))))
+  (apply fn args))
 
 (define-advice package-refresh-contents
     (:around (fn &optional async) eon-elpa-package-refresh-contents)

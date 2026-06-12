@@ -14,15 +14,22 @@
 (defun eon-project--git-repo-p (dir)
   (file-exists-p (expand-file-name ".git" dir)))
 
+(defun eon-project--git-submodule-p (dir)
+  ".git 是普通文件（而非目录），说明 dir 是子模块。"
+  (let ((git-path (expand-file-name ".git" dir)))
+    (and (file-exists-p git-path)
+         (not (file-directory-p git-path)))))
+
 (defun eon-project--git-repos-in-project (root)
-  "收集 ROOT 及其直接子目录中的 Git 仓库路径。"
+  "收集 ROOT 及其直接子目录中的 Git 仓库路径，跳过子模块。"
   (let ((root (directory-file-name (expand-file-name root)))
         repos)
     (when (eon-project--git-repo-p root)
       (push root repos))
     (dolist (dir (directory-files root t "^[^.].*" t))
       (when (and (file-directory-p dir)
-                 (eon-project--git-repo-p dir))
+                 (eon-project--git-repo-p dir)
+                 (not (eon-project--git-submodule-p dir)))
         (push dir repos)))
     repos))
 
