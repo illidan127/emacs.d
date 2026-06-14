@@ -107,18 +107,42 @@
           (select-window win))
       (switch-to-buffer buf))))
 
+(defun eon-project--agent-shell-workspaces ()
+  "返回所有已打开 agent-shell buffer 的 workspace 列表。"
+  (seq-filter (lambda (ws)
+                (seq-some (lambda (buf)
+                            (and (buffer-live-p buf)
+                                 (with-current-buffer buf
+                                   (derived-mode-p 'agent-shell-mode))))
+                          (eon-workspace-buffer-list ws)))
+              eon-workspace--list))
+
 ;;;###autoload
 (defun eon-project-switch-to-blocked-agent-shell ()
-  "切换到第一个等待用户授权（permission）的 agent-shell buffer。
-遍历当前 Emacs 中全部 agent-shell 实例。
-若无等待授权的 shell，则报错。"
+  "切换到第一个等待用户授权的 agent-shell buffer。
+若无等待授权的 shell，则在已打开 agent-shell 的工作区窗口间循环切换。"
   (interactive)
   (require 'agent-shell)
+  (require 'eon-workspace)
   (if-let ((buf (eon-project--first-blocked-agent-shell-buffer)))
       (progn
         (eon-project--switch-to-buffer-in-any-frame buf)
         (message "已切换到等待授权的 agent-shell: %s" (buffer-name buf)))
-    (user-error "没有等待用户授权的 agent-shell")))
+    (let ((ws-list (eon-project--agent-shell-workspaces)))
+      (if (null ws-list)
+          (user-error "没有已打开 agent-shell 的工作区窗口"))
+      (let* ((current (eon-workspace-current))
+             (idx (or (cl-position current ws-list) (1- (length ws-list))))
+             (next-idx (% (1+ idx) (length ws-list)))
+             (next-ws (nth next-idx ws-list))
+             (agent-buf (seq-find
+                         (lambda (buf)
+                           (and (buffer-live-p buf)
+                                (with-current-buffer buf
+                                  (derived-mode-p 'agent-shell-mode))))
+                         (eon-workspace-buffer-list next-ws))))
+        (select-frame-set-input-focus (eon-workspace-frame next-ws))
+        (select-window (get-buffer-window agent-buf (eon-workspace-frame next-ws)))))))
 
 
 (use-package eon-workspace
