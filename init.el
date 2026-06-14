@@ -12,6 +12,7 @@
 (server-start)
 
 (require 'eon-env)
+(require 'eon-load-paths)
 (require 'eon-secrets nil t)
 (require 'eon-lib)
 (require 'eon-input-method)
