@@ -44,7 +44,7 @@
     (if (and (eq (org-element-type element) 'headline)
 	     (= 1 (org-element-property :level element)))
 	(progn
-	  (org-sort-entries t ?o)
+	  (ignore-errors (org-sort-entries t ?o))
 	  (org-fold-hide-subtree)
 	  (org-fold-show-children)))))
 
@@ -59,7 +59,7 @@
   "某条待办变更后，重排其所在待办序列"
   (interactive)
   (org-up-heading-safe)
-  (org-sort-entries t ?o)
+  (ignore-errors (org-sort-entries t ?o))
   (org-fold-hide-subtree)
   (org-fold-show-children))
 
@@ -317,7 +317,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   ;; org-latex-preview时设置背景透明
   (plist-put org-format-latex-options :background "Transparent")
   (setq org-todo-keywords
-	'((sequence "进行中(j)" "开发中(k)" "发布中(f)" "待发布(d)" "待办(D)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
+	'((sequence "发布中(f)" "待发布(d)" "进行中(j)" "开发中(k)" "待办(D)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
   (setq org-todo-keyword-faces
 	'(("待办" . "red")
 	  ("进行中" . (:foreground "#51cf66" :weight bold))
