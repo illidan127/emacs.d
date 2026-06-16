@@ -263,6 +263,12 @@ Reads the `branch-todo' mapping from the workspace's `.eon.yaml'."
     (let ((uuid (eon-branch-todo--uuid-for-branch yaml-file branch)))
       (unless uuid
         (user-error "分支 `%s' 未关联任何 TODO" branch))
+      ;; 临时解除所有 org agenda 文件的窄化状态，确保 ID 搜索不受影响
+      (dolist (f org-agenda-files)
+        (when-let ((buf (find-buffer-visiting f)))
+          (with-current-buffer buf
+            (when (buffer-narrowed-p)
+              (widen)))))
       (org-id-goto uuid)
       (message "已跳转到: %s" (org-get-heading t t t t)))))
 
