@@ -23,6 +23,7 @@
 (require 'eon-dired)
 (require 'eon-yasnippet)
 (require 'eon-vcs)
+(require 'eon-branch-todo)
 (require 'eon-magit-agent-commit)
 (require 'eon-auto-format)
 (require 'eon-editor)

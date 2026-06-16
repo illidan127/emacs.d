@@ -361,7 +361,8 @@
     ("k" "delete"            magit-branch-delete)]
    [""
     (7 "h" "shelve"          magit-branch-shelve)
-    (7 "H" "unshelve"        magit-branch-unshelve)]]
+    (7 "H" "unshelve"        magit-branch-unshelve)]
+   [("T" "find todo"         eon-branch-todo-find-todo)]]
   (interactive (list (magit-get-current-branch)))
   (transient-setup 'eon-magit-branch nil nil :scope branch))
 
@@ -734,4 +735,8 @@ Returns plist or nil if user cancels or repo has no tags."
          (result (eon-magit-repo-tag-info--collect repo)))
     (when result
       (eon-magit-repo-tag-info--display (list result)))))
+(require 'eon-branch-todo)
+(advice-add 'magit-branch-and-checkout :after #'eon-branch-todo--after-branch-create)
+(advice-add 'magit-branch-create :after #'eon-branch-todo--after-branch-create)
+
 (provide 'eon-vcs)
