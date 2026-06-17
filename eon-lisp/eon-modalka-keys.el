@@ -75,6 +75,7 @@
 	 (pcase major-mode
 	   ('dired-mode #'dired-flag-file-deletion)
 	   ('magit-status-mode (eon-magit-key-infer "d"))
+	   ('magit-revision-mode (eon-magit-key-infer "d"))
 	   (_ "C-d"))))
     realkey))
 
