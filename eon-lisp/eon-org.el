@@ -114,7 +114,17 @@
   (transient-setup 'eon-org-agenda))
 
 (defun eon-org-agenda--dispatch (keys)
-  (org-agenda current-prefix-arg keys eon-org-agenda--restriction))
+  "调用 `org-agenda' 在当前窗口打开视图，退出时恢复之前的 buffer。"
+  (let ((prev-buffer (current-buffer))
+        (org-agenda-window-setup 'current-window))
+    (org-agenda current-prefix-arg keys eon-org-agenda--restriction)
+    (when (derived-mode-p 'org-agenda-mode)
+      (setq-local org-agenda-window-setup 'current-window)
+      (add-hook 'kill-buffer-hook
+                (lambda ()
+                  (when (buffer-live-p prev-buffer)
+                    (switch-to-buffer prev-buffer)))
+                nil t))))
 
 (defmacro eon-org-agenda--def-cmd (key doc &optional fn-name)
   (let ((sym (intern (concat "eon-org-agenda--"

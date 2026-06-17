@@ -398,6 +398,10 @@
 		    ('messages-buffer-mode #'quit-window)
 		    ('treemacs-mode #'treemacs-quit)
 		    ('org-agenda-mode #'org-agenda-quit)
+		    ('org-mode (if (and (buffer-file-name)
+				        (member (buffer-file-name) (org-agenda-files)))
+			       #'quit-window
+			     nil))
 		    ('compilation-mode #'quit-window)
 		    ('go-test-mode #'quit-window)
   		    (_ (cond ((derived-mode-p 'special-mode) #'quit-window)
