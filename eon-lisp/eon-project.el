@@ -34,18 +34,29 @@
     repos))
 
 (defun eon-reset-magit-repository-list ()
-  "根据 eon-workspace 已知项目列表，重置 `magit-repository-directories'。"
+  "根据选定标签过滤工作区，重置 `magit-repository-directories'。
+先提示选择标签，只纳入带有该标签的工作区项目。"
   (interactive)
   (require 'eon-workspace)
-  (let* ((projects (eon-workspace--known-projects))
-         (repos (cl-delete-duplicates
-                 (apply #'append
-                        (mapcar #'eon-project--git-repos-in-project projects))
-                 :test #'string=)))
-    (setq magit-repository-directories
-          (if repos
-              (mapcar (lambda (dir) (cons dir 0)) repos)
-            nil))))
+  (let* ((all-tags (cl-delete-duplicates
+                    (cl-loop for entry in eon-workspace--projects
+                             append (cdr entry))
+                    :test #'string=))
+         (tag (if all-tags
+                  (completing-read "选择标签: " all-tags nil t)
+                (user-error "没有可用的标签"))))
+    (eon-workspace--ensure-projects-loaded)
+    (let* ((tagged-dirs (cl-loop for entry in eon-workspace--projects
+                                 when (member tag (cdr entry))
+                                 collect (car entry)))
+           (repos (cl-delete-duplicates
+                   (apply #'append
+                          (mapcar #'eon-project--git-repos-in-project tagged-dirs))
+                   :test #'string=)))
+      (setq magit-repository-directories
+            (if repos
+                (mapcar (lambda (dir) (cons dir 0)) repos)
+              nil)))))
 
 
 (defun eon-magit-status-wrapper ()
