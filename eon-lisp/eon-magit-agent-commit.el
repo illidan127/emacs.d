@@ -201,13 +201,9 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
   (let* ((diff (eon-magit-agent-commit--staged-diff))
          (log (eon-magit-agent-commit--recent-log))
          (diff-text (if (string-empty-p diff) "(无 staged diff)" diff)))
-    (format (concat "请根据以下已 stage 的 git 变更，生成一条 commit message。\n\n"
-                    "要求：\n"
-                    "- 参考最近 commit 的 subject/body 风格，但不要复制类别前缀\n"
-                    "- 不要输出 feat:/fix:/docs: 或 [配置]: 等前缀（用户稍后会单独选择）\n"
-                    "- 第一行 subject 简洁；仅在 why 不明显时加 body（空一行后写）\n"
-                    "- 只输出 commit message 正文，不要 markdown 代码块，不要额外解释\n"
-                    "- 不要执行 git commit，不要修改文件\n\n"
+    (format (concat "/caveman-commit 根据以下已 stage 的 git 变更，生成一条 commit message。\n\n"
+                    "注意：不要输出 feat:/fix:/docs: 等 Conventional Commits 前缀，"
+                    "也不要输出 [配置]: 等中文前缀（用户稍后会单独选择类别前缀）。\n\n"
                     "最近 commit：\n%s\n\n"
                     "已 stage diff：\n---\n%s\n---")
             log diff-text)))
