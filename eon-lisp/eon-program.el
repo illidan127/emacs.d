@@ -82,6 +82,28 @@
   (setq agent-shell-cursor-acp-command `("cursor-agent" "--api-key" ,eon-cursor-api-key "acp"))
   (setq agent-shell-anthropic-claude-environment
         (apply #'agent-shell-make-environment-variables claude-deepseek-env))
+
+  (defun eon-agent-shell--read-global-rules ()
+    "Read all .md files from ~/.config/skillshare/extras/rules/ and return as one string."
+    (let ((rules-dir (expand-file-name "~/.config/skillshare/extras/rules/"))
+          (result nil))
+      (when (file-directory-p rules-dir)
+        (dolist (f (directory-files rules-dir t "\\.md$"))
+          (let ((content (with-temp-buffer
+                           (insert-file-contents f)
+                           (buffer-string))))
+            (push content result))))
+      (string-join (nreverse result) "\n")))
+
+  (setq agent-shell-outgoing-request-decorator
+        (lambda (request)
+          (when (equal (map-elt request :method) "session/new")
+            (let ((rules-content (eon-agent-shell--read-global-rules)))
+              (unless (string-empty-p rules-content)
+                (map-put! request :params
+                          (cons `(_meta . ((systemPrompt . ((append . ,rules-content)))))
+                                (map-elt request :params))))))
+          request))
   )
 
 (use-package ghostel
