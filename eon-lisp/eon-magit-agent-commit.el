@@ -200,12 +200,14 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
 (defun eon-magit-agent-commit--build-prompt ()
   (let* ((diff (eon-magit-agent-commit--staged-diff))
          (log (eon-magit-agent-commit--recent-log))
-         (diff-text (if (string-empty-p diff) "(无 staged diff)" diff)))
-    (format (concat "根据以下已 stage 的 git 变更，生成一条 commit message。\n\n"
-                    "注意：不要输出 feat:/fix:/docs: 等 Conventional Commits 前缀，"
-                    "也不要输出 [配置]: 等中文前缀（用户稍后会单独选择类别前缀）。\n\n"
-                    "最近 commit：\n%s\n\n"
-                    "已 stage diff：\n---\n%s\n---")
+         (diff-text (if (string-empty-p diff) "(无暂存变更)" diff)))
+    (format (concat "请为以下 git 暂存区变更生成一条提交信息。\n\n"
+                    "要求：\n"
+                    "1. 仅输出提交信息正文，严禁包含任何前缀（如 feat:、fix:、[配置]: 等），前缀将由用户后续手动选择\n"
+                    "2. 使用简洁中文描述变更内容及目的，风格参考最近提交记录\n"
+                    "3. 标题控制在 50 字以内，确需补充说明时空一行再写正文\n\n"
+                    "最近提交记录：\n```\n%s\n```\n\n"
+                    "暂存区变更：\n```diff\n%s\n```")
             log diff-text)))
 
 (defun eon-magit-agent-commit--strip-fences (text)
