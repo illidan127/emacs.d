@@ -64,7 +64,7 @@
 (define-key modalka-mode-map "w" eon-window-op-map)
 (modalka-define-kbd "x" #'eon-modalka-x)
 
-(modalka-define-kbd "y" "C-y")
+(modalka-define-kbd "y" #'eon-modalka-y)
 (modalka-define-kbd "z" #'eon-modalka-z)
 
 (modalka-define-kbd "SPC" "C-SPC")

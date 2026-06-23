@@ -480,6 +480,13 @@
 	   (_ #'em-x-command))))
     realkey))
 
+(defun em-y (&optional key-list)
+  (let ((realkey
+	 (pcase major-mode
+	   ('magit-status-mode #'magit-show-refs)
+	   (_ "C-y"))))
+    realkey))
+
 (defun em-z (&optional key-list)
   (let ((realkey
 	 (pcase major-mode
