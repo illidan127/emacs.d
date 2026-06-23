@@ -519,16 +519,21 @@
       (cons (format "https://%s/%s/commit/" host name)
             (format "https://%s/" host)))))
 
+(defun eon-version-string< (a b)
+  "Compare A and B as version strings, stripping leading non-numeric chars."
+  (version< (replace-regexp-in-string "\\`[^0-9]+" "" a)
+            (replace-regexp-in-string "\\`[^0-9]+" "" b)))
+
 (defun eon-magit-repo-tag-info--prompt-tags (repo-label sorted-tags old-def new-def)
   "Prompt for old and new tags from SORTED-TAGS, with defaults.
 Returns (old-tag new-tag) or nil if user cancels."
-  (let* ((old-tag (completing-read
+  (let* ((old-tag (ivy-read
                    (format "[%s] 旧tag: " repo-label)
-                   sorted-tags nil t nil nil old-def))
+                   sorted-tags :require-match t :initial-input old-def))
          (rest (cdr (member old-tag sorted-tags)))
-         (new-tag (completing-read
+         (new-tag (ivy-read
                    (format "[%s] 新tag: " repo-label)
-                   rest nil t nil nil new-def)))
+                   rest :require-match t :initial-input new-def)))
     (list old-tag new-tag)))
 
 (defun eon-magit-repo-tag-info--collect (repo &optional old-def new-def)
@@ -537,7 +542,7 @@ Returns plist or nil if user cancels or repo has no tags."
   (let ((default-directory (file-name-as-directory (expand-file-name repo)))
         (repo-label (file-name-nondirectory (directory-file-name repo))))
     (magit-call-git "fetch" "--tags" "--force")
-    (let* ((sorted-tags (sort (magit-list-tags) #'string<)))
+    (let* ((sorted-tags (sort (magit-list-tags) #'eon-version-string<)))
       (unless sorted-tags
         (message "[%s] 没有 tag，跳过" repo-label)
         (cl-return-from eon-magit-repo-tag-info--collect nil))
@@ -648,18 +653,18 @@ Returns plist or nil if user cancels or repo has no tags."
          (repo-label (file-name-nondirectory (directory-file-name repo)))
          (prev (gethash repo eon-magit-repolist-tag-selections)))
     (magit-call-git "fetch" "--tags" "--force")
-    (let* ((sorted-tags (sort (magit-list-tags) #'string<)))
+    (let* ((sorted-tags (sort (magit-list-tags) #'eon-version-string<)))
       (unless sorted-tags
         (user-error "[%s] 没有 tag" repo-label))
       (let* ((old-def (car prev))
              (new-def (cdr prev))
-             (old-tag (completing-read
+             (old-tag (ivy-read
                        (format "[%s] 旧tag: " repo-label)
-                       sorted-tags nil t nil nil old-def))
+                       sorted-tags :require-match t :initial-input old-def))
              (rest (cdr (member old-tag sorted-tags)))
-             (new-tag (completing-read
+             (new-tag (ivy-read
                        (format "[%s] 新tag: " repo-label)
-                       rest nil t nil nil new-def)))
+                       rest :require-match t :initial-input new-def)))
         (puthash repo (cons old-tag new-tag) eon-magit-repolist-tag-selections)
         (message "[%s] %s..%s" repo-label old-tag new-tag)))))
 
@@ -680,15 +685,15 @@ Returns plist or nil if user cancels or repo has no tags."
                                (let ((default-directory
                                        (file-name-as-directory (expand-file-name repo))))
                                  (magit-call-git "fetch" "--tags" "--force")
-                                 (let* ((sorted-tags (sort (magit-list-tags) #'string<)))
+                                 (let* ((sorted-tags (sort (magit-list-tags) #'eon-version-string<)))
                                    (if sorted-tags
-                                       (let* ((old-tag (completing-read
+                                       (let* ((old-tag (ivy-read
                                                         (format "[%s] 旧tag: " repo-label)
-                                                        sorted-tags nil t))
+                                                        sorted-tags :require-match t))
                                               (rest (cdr (member old-tag sorted-tags)))
-                                              (new-tag (completing-read
+                                              (new-tag (ivy-read
                                                         (format "[%s] 新tag: " repo-label)
-                                                        rest nil t)))
+                                                        rest :require-match t)))
                                          (puthash repo (cons old-tag new-tag)
                                                   eon-magit-repolist-tag-selections)
                                          (cons old-tag new-tag))
