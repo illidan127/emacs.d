@@ -86,4 +86,55 @@
   :diminish
   :bind ("C-=" . er/expand-region))
 
+(defconst eon--url-weak-chars "[:alnum:]-.&"
+  "URL 弱边界字符：字母数字及 `-` `.` `&`，同属一个语义段。")
+
+(defconst eon--url-strong-chars '(?/ ?= ??)
+  "URL 强边界字符：`/` `=` `?`，段与段之间的分隔。")
+
+(defun eon/mark-url-weak-segment ()
+  "标出字母数字与弱符号(`-` `.` `&`)连续段，遇强符号(`/` `=` `?`)停。
+对应边界优先级第一、二层：连续字母数字 → 弱符号段。"
+  (interactive)
+  (let ((chars eon--url-weak-chars))
+    (when (or (looking-at (format "[%s]" chars))
+              (er/looking-back-on-line (format "[%s]" chars)))
+      (skip-chars-forward chars)
+      (set-mark (point))
+      (skip-chars-backward chars))))
+
+(defun eon/mark-url-strong-cross ()
+  "跨过一个强符号(`/` `=` `?`)及其相邻弱段，向外扩一层。
+仅在已有选区时动作，避免首轮抢占 `er/mark-word'。左侧优先，其次右侧。"
+  (interactive)
+  (when (use-region-p)
+    (let* ((cur-start (min (point) (mark)))
+           (cur-end   (max (point) (mark)))
+           (line-beg  (line-beginning-position))
+           (line-end  (line-end-position))
+           (weak      eon--url-weak-chars)
+           (new-start
+            (save-excursion
+              (goto-char cur-start)
+              (skip-chars-backward weak line-beg)
+              (when (memq (char-before) eon--url-strong-chars)
+                (backward-char 1)
+                (skip-chars-backward weak line-beg)
+                (point))))
+           (new-end
+            (save-excursion
+              (goto-char cur-end)
+              (skip-chars-forward weak line-end)
+              (when (memq (char-after) eon--url-strong-chars)
+                (forward-char 1)
+                (skip-chars-forward weak line-end)
+                (point)))))
+      (cond
+       ((and new-start (< new-start cur-start))
+        (goto-char new-start)
+        (set-mark cur-end))
+       ((and new-end (> new-end cur-end))
+        (goto-char cur-start)
+        (set-mark new-end))))))
+
 (provide 'eon-selection-op)

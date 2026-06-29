@@ -81,7 +81,7 @@
   :config
   (setq agent-shell-cursor-acp-command `("cursor-agent" "--api-key" ,eon-cursor-api-key "acp"))
   (setq agent-shell-anthropic-claude-environment
-        (apply #'agent-shell-make-environment-variables claude-deepseek-env))
+        (apply #'agent-shell-make-environment-variables claude-env))
   )
 
 (use-package ghostel

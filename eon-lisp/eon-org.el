@@ -285,6 +285,15 @@ EON-AGENDA-QUERY-REGEXP的记录"
 
 (use-package uuid)
 
+(defun eon-org-setup-expand-region ()
+  "为 org buffer 注入 URL 分段扩展候选至 `er/try-expand-list'。
+边界优先级：字母数字 → 弱符号(`-` `.` `&`) → 强符号(`/` `=` `?`)。"
+  (require 'expand-region)
+  (require 'eon-selection-op)
+  (make-local-variable 'er/try-expand-list)
+  (add-to-list 'er/try-expand-list 'eon/mark-url-weak-segment 'append)
+  (add-to-list 'er/try-expand-list 'eon/mark-url-strong-cross 'append))
+
 (use-package org
   :ensure nil
   :init
@@ -419,7 +428,9 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (org-babel-after-execute . org-redisplay-inline-images)
   ;; 设置一些符号
   (org-mode . eon-reset-org-mode-prettify-symbols-alist)
-  (org-mode . prettify-symbols-mode))
+  (org-mode . prettify-symbols-mode)
+  ;; expand-region 以 `/` 为界逐段扩展 URL path
+  (org-mode . eon-org-setup-expand-region))
 
 
 (use-package
