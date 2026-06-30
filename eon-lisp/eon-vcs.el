@@ -562,7 +562,7 @@ Returns plist or nil if user cancels or repo has no tags."
                   :old-tag old-tag :new-tag new-tag)))))))
 
 (defun eon-magit-repo-tag-info--format-commits (results)
-  "Format RESULTS into markdown string for buffer insertion."
+  "Format RESULTS as markdown followed by plain-text version for buffer insertion."
   (with-temp-buffer
     (dolist (r results)
       (let ((range (plist-get r :range))
@@ -584,6 +584,22 @@ Returns plist or nil if user cancels or repo has no tags."
                                       author (cdr urls) author))
                     (insert (format "- `%s` %s — %s\n"
                                     hash subject author))))))))
+        (insert "\n")))
+    (insert "\n===== 纯文本版本 =====\n\n")
+    (dolist (r results)
+      (let ((range (plist-get r :range))
+            (log-output (plist-get r :log)))
+        (if (= (length results) 1)
+            (insert (format "提交变更: %s\n\n" range))
+          (insert (format "%s\n\n" (plist-get r :repo-label)))
+          (insert (format "变更范围: %s\n\n" range)))
+        (if (string-empty-p (string-trim log-output))
+            (insert "无提交记录\n\n")
+          (dolist (line (split-string log-output "\n" t))
+            (let ((parts (split-string line "\t")))
+              (when (>= (length parts) 3)
+                (cl-destructuring-bind (hash subject author) parts
+                  (insert (format "- %s %s — %s\n" hash subject author)))))))
         (insert "\n")))
     (buffer-string)))
 
