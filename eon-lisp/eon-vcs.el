@@ -172,6 +172,7 @@
       (eon--ensure-git-user-identity-before-direct-commit)))
   (setq magit-log-margin
 	'(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+  (setq magit-diff-refine-hunk t)
   (define-key magit-status-mode-map (kbd "C-w") nil)
   (define-key magit-diff-mode-map (kbd "C-w") nil)
   (define-key magit-log-mode-map (kbd "C-w") nil)

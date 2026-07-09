@@ -365,14 +365,30 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
     (message "已向 agent-shell 请求提交信息…")
     (eon-magit-agent-commit--send-agent-request shell (current-buffer))))
 
+(defun eon-magit-agent-commit--invoked-by-key-p ()
+  "判断当前 `magit-commit-create' 是否通过快捷键（而非 M-x）调用。
+
+通过 M-x 调用时，触发命令的最后一个输入事件是 RET（回车确认
+minibuffer）；通过 Magit transient 菜单的 c c 或其他按键序列调用时，
+最后一个事件是对应的按键。"
+  (let ((event last-command-event))
+    (and event
+         (not (and (integerp event)
+                   (or (= event ?\r)     ; RET
+                       (= event ?\n))))))) ; LFD
+
 (cl-defun eon-magit-agent-commit--magit-commit-create (orig &optional args)
-  "先 AI 预生成提交信息，再调用 `magit-commit-create' 打开 COMMIT_EDITMSG。"
+  "先 AI 预生成提交信息，再调用 `magit-commit-create' 打开 COMMIT_EDITMSG。
+
+仅当通过快捷键调用时才触发 AI 预生成；通过 M-x 调用时直接打开提交
+buffer，由用户自行编写提交信息。"
   (let ((default-directory (magit-toplevel)))
     (require 'eon-vcs)
     (unless (eon--ensure-git-user-identity)
       (eon-magit-agent-commit--cancel-prefetch)
       (cl-return-from eon-magit-agent-commit--magit-commit-create nil))
-    (if (eon-magit-agent-commit--should-prefetch-p args)
+    (if (and (eon-magit-agent-commit--invoked-by-key-p)
+             (eon-magit-agent-commit--should-prefetch-p args))
         (progn
           (unless (setq args (magit-commit-assert args))
             (cl-return-from eon-magit-agent-commit--magit-commit-create nil))
