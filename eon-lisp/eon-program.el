@@ -79,13 +79,8 @@
 
 (use-package agent-shell
   :config
-  (setq agent-shell-cursor-acp-command `("cursor-agent" "--api-key" ,eon-cursor-api-key "acp"))
   (setq agent-shell-anthropic-claude-environment
         (apply #'agent-shell-make-environment-variables claude-env))
-  (setq agent-shell-goose-environment
-	(apply #'agent-shell-make-environment-variables goose-env))
-  (setq agent-shell-goose-authentication
-        (agent-shell-make-goose-authentication :none t))
   )
 
 (use-package ghostel
