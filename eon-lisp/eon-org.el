@@ -35,7 +35,7 @@
 (defun eon-org-archive-archivable()
   "归档过期条目"
   (interactive)
-  (org-ql-select org-agenda-files `(and (or (parent (heading "工作")) (parent (heading "项目"))) (level 2) (closed :to ,(ts-format (ts-adjust 'day -30 (ts-now)))))
+  (org-ql-select org-agenda-files `(and (level 1) (closed :to ,(ts-format (ts-adjust 'day -30 (ts-now)))))
     :action 'org-archive-subtree))
 
 (defun eon--reorder-todos ()
@@ -336,7 +336,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   ;; org-latex-preview时设置背景透明
   (plist-put org-format-latex-options :background "Transparent")
   (setq org-todo-keywords
-	'((sequence "发布中(f)" "待发布(d)" "进行中(j)" "开发中(k)" "待办(D)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
+	'((sequence "待办(D)" "进行中(j)" "待发布(d)" "发布中(f)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
   (setq org-todo-keyword-faces
 	'(("待办" . "red")
 	  ("进行中" . (:foreground "#51cf66" :weight bold))
@@ -353,17 +353,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (add-hook 'org-insert-heading-hook #'eon-org-insert-heading-add-properties-from-auto-tags 'append)
   (add-to-list
    'org-capture-templates
-   `("w" "工作待办" entry (id "60d5b5e0-b803-442f-bc6d-1dc55148802c")
-     "* 待办 %? %x" :prepend t :before-finalize org-id-get-create))
-
-  (add-to-list
-   'org-capture-templates
-   `("x" "项目待办" entry (id "19b7a7a2-19ae-4abf-8092-ef4595217b96")
-     "* 待办 %? %x" :prepend t :before-finalize org-id-get-create))
-
-  (add-to-list
-   'org-capture-templates
-   `("k" "事业待办" entry (id "4f9c72dd-75a0-4fc0-83bd-ef74693132d7")
+   `("w" "待办" entry (file ,(car org-agenda-files))
      "* 待办 %? %x" :prepend t :before-finalize org-id-get-create))
 
   ;; 优先级设置
@@ -375,7 +365,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
 			(?B . (:foreground "blue"))
 			(?C . (:foreground "blue"))))
 
-  (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s") (todo . " %i %-12:c %(car (org-get-outline-path)) ")
+  (setq org-agenda-prefix-format '((agenda . " %i %-6:c%?-12t% s") (todo . " %i %-6:c%(or (car (org-get-outline-path)) \"\") ")
 				   (tags . " %i %-12:c") (search . " %i %-12:c")))
 
   ;; 嵌入文件支持
