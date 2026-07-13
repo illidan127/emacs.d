@@ -216,8 +216,8 @@ Prompts the user to select an existing TODO, create a new one, or skip."
               (with-current-buffer (find-file file)
                 (save-restriction
                   (widen)
-                  (goto-char (point-max))
-                  (unless (bolp) (insert "\n"))
+                  (goto-char (point-min))
+                  (unless (org-at-heading-p) (outline-next-heading))
                   (org-insert-heading-respect-content)
                   (insert title)
                   (org-todo 'next))
