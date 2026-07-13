@@ -149,6 +149,87 @@
                  (nth 0 v) (version-to-string (nth 1 v)) (version-to-string (nth 2 v)))))
     (list :violations violations :version-mismatches version-mismatches)))
 
+(defun eon-elpa--async-fetch-recipe (recipe-name on-done)
+  "异步拉取 RECIPE-NAME 的源码。
+ON-DONE 接收 (RECIPE-NAME ERROR-MSG)，成功时 ERROR-MSG 为 nil。"
+  (condition-case err
+      (let* ((rcp (package-recipe-lookup recipe-name))
+             (dir (package-recipe--working-tree rcp))
+             (url (oref rcp url))
+             (git-dir (expand-file-name ".git" dir)))
+        (if (file-exists-p git-dir)
+            ;; 已有仓库 → 异步 fetch
+            (make-process
+             :name (format "eon-elpa-fetch-%s" recipe-name)
+             :command `("git" "-C" ,dir "fetch" "-f" "--tags" "origin")
+             :buffer (generate-new-buffer
+                      (format " *eon-elpa-fetch-%s*" recipe-name))
+             :connection-type 'pipe
+             :noquery t
+             :sentinel (eon-elpa--make-fetch-sentinel recipe-name on-done))
+          ;; 新仓库 → 异步 clone
+          (when (file-exists-p dir)
+            (delete-directory dir t))
+          (make-directory package-build-working-dir t)
+          (make-process
+           :name (format "eon-elpa-clone-%s" recipe-name)
+           :command `("git" "clone" "--filter=blob:none" ,url ,dir)
+           :buffer (generate-new-buffer
+                    (format " *eon-elpa-clone-%s*" recipe-name))
+           :connection-type 'pipe
+           :noquery t
+           :sentinel (eon-elpa--make-fetch-sentinel recipe-name on-done))))
+    (error
+     (funcall on-done recipe-name (error-message-string err)))))
+
+(defun eon-elpa--make-fetch-sentinel (recipe-name on-done)
+  "为异步 fetch/clone 进程创建 sentinel。"
+  (lambda (p _event)
+    (let ((ok (eq 0 (process-exit-status p)))
+          (err (unless (eq 0 (process-exit-status p))
+                 (with-current-buffer (process-buffer p)
+                   (goto-char (point-max))
+                   (forward-line -1)
+                   (string-trim
+                    (buffer-substring (line-beginning-position)
+                                      (line-end-position)))))))
+      (kill-buffer (process-buffer p))
+      (funcall on-done recipe-name (unless ok err)))))
+
+(defun eon-elpa-build-all-async ()
+  "异步拉取所有包源码，全部完成后统一构建。"
+  (interactive)
+  (let* ((recipes (directory-files package-build-recipes-dir nil "^[^.]"))
+         (total (length recipes))
+         (completed 0)
+         (errors nil))
+    (if (zerop total)
+        (message "无配方需要构建")
+      (message "开始异步拉取 %d 个包的源码..." total)
+      (dolist (recipe recipes)
+        (eon-elpa--async-fetch-recipe
+         recipe
+         (lambda (name err)
+           (when err
+             (push (cons name err) errors))
+           (cl-incf completed)
+           (message "拉取进度: %d/%d %s" completed total name)
+           (when (= completed total)
+             (if errors
+                 (message "拉取完成，%d 个失败: %s。继续构建其余包..."
+                          (length errors)
+                          (string-join (mapcar #'car errors) ", "))
+               (message "拉取完成（%d/%d），开始构建..." total total))
+             (let ((package-build--inhibit-fetch t))
+               (dolist (recipe recipes)
+                 (unless (assoc recipe errors)
+                   (condition-case err
+                       (eon-elpa--build-one recipe)
+                     (error
+                      (message "构建失败 %s: %s"
+                               recipe (error-message-string err)))))))
+             (message "构建完成"))))))))
+
 (defun eon-elpa--find-local-dependents (pkg-name)
   "找出本地已安装包中依赖 PKG-NAME 的包名列表。"
   (let ((pkg-sym (intern pkg-name))
@@ -204,9 +285,9 @@
     (when (file-exists-p dir)
       (delete-directory dir t)))
   ;; 重建 archive
-  (message "正在重建 archive...")
-  (eon-elpa-build-all)
-  (message "%s 已移除，archive 已重建" recipe-name))
+  (message "正在异步重建 archive...")
+  (eon-elpa-build-all-async)
+  (message "%s 配方已移除，archive 正在后台重建" recipe-name))
 
 (eon-elpa--sanitize-package-archives)
 
