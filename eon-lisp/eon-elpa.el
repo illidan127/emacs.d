@@ -16,16 +16,6 @@
   (package-build-archive recipe)
   (package-build-cleanup))
 
-(defun eon-elpa-build (recipes)
-  "构建RECIPES指定的包。"
-  (dolist (recipe recipes)
-    (eon-elpa--build-one recipe)))
-
-(defun eon-elpa-build-all ()
-  "重新构建所有包。"
-  (interactive)
-  (eon-elpa-build (directory-files package-build-recipes-dir nil "^[^.]")))
-
 (defun eon-elpa-find-missing-recipes ()
   "找出已安装的非内置扩展中在 recipes 目录没有对应配方的包"
   (interactive)
