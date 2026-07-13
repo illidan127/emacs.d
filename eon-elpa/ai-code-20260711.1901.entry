@@ -1,0 +1,11 @@
+(ai-code
+ . [(20260711 1901)
+    ((emacs (29 1)) (transient (0 9 0)) (magit (2 1 0)))
+    "Unified interface for AI coding backends such as Codex CLI, Antigravity CLI, Claude Code, Opencode, etc"
+    tar
+    ((:url . "https://github.com/tninja/ai-code-interface.el")
+     (:commit . "16eaed63953d3aca5716a1a9b454a2b8dec707ee")
+     (:revdesc . "16eaed63953d")
+     (:authors ("Kang Tu" . "tninja@gmail.com"))
+     (:maintainers ("Kang Tu" . "tninja@gmail.com"))
+     (:maintainer "Kang Tu" . "tninja@gmail.com"))])

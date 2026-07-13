@@ -1,0 +1,7 @@
+(eon-workspace
+ . [(20260706 1017) ((emacs (27 1)))
+    "Frame-based workspaces with project root" tar
+    ((:url . "https://github.com/illidan127/eon-workspace")
+     (:commit . "f5f92e01bb720b2ccf4ffb704fe624e32c462f87")
+     (:revdesc . "f5f92e01bb72")
+     (:keywords "convenience" "workspace" "frames" "project"))])

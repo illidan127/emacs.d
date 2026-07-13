@@ -4,7 +4,7 @@
 特性：
   - 每个 workspace 运行在独立 frame 中
   - 每个 workspace 绑定一个工作目录，创建后不可变更
-  - eon-workspace-create 从已知项目列表选择（按 recent 文件 MRU 排序）：已打开则切换，未打开则创建
+  - eon-workspace-create 从已知项目列表选择：已打开的工作区按 MRU 排最前，未打开项随后；已打开则切换，未打开则创建
   - 可以在 workspace 中打开非工作目录的文件
   - 每个 workspace 维护私有 buffer 列表（基于 window-buffer-change-functions
     自动追踪 frame 中显示过的 buffer），eon-workspace-switch-to-buffer
@@ -16,7 +16,10 @@
   - eon-workspace-find-file 通过 fd 列出 ROOT 下文件，ivy 补全选择
     （支持 ivy-occur 等 ivy-read 能力），
     遵守 .gitignore，并叠加 ROOT/.eon.yaml 中
-    ignore-patterns: 配置的额外过滤模式
+    ignore-patterns: 配置的额外过滤模式，
+    同时 collection-files: 列表中的文件会被强制纳入候选
+  - 每个 workspace 可打多个标签，标签从 `eon-workspace-tag-presets'
+    预设列表中选取，持久化在 eon-workspace-projects.el 的 alist 中
   - 提供清理命令，清理当前 workspace 中非工作目录文件对应的 buffer，
     临时 buffer（无文件关联、名字以空格或 * 开头）不处理
 
@@ -25,6 +28,8 @@
   ignore-patterns:
     - "*.log"
     - "dist"
+  collection-files:
+    - "src/generated.rs"
   action:
     default: compile
     compile: |
@@ -43,8 +48,10 @@
   M-x eon-workspace-list            列出所有 workspace
   M-x eon-workspace-add-project     手工把目录加入已知项目列表
   M-x eon-workspace-remove-project  从已知项目列表中移除
+  M-x eon-workspace-tag                设置当前工作区标签（从预设列表多选）
+  M-x eon-workspace-get-tags           获取当前工作区标签列表
+  M-x eon-workspace-add-collection-file  将当前文件加入 collection-files
   M-x eon-workspace-init-config     在当前 workspace 根目录创建 .eon.yaml
-  M-x eon-workspace-config           用 customize 风格界面编辑 .eon.yaml
   M-x eon-workspace-compile          执行 compile 命令（向后兼容，推荐 action.compile）
   M-x eon-workspace-action            从 .eon.yaml 中选择并执行 action
   M-x eon-workspace-action-default    执行默认 action

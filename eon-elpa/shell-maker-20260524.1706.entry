@@ -1,6 +1,0 @@
-(shell-maker
- . [(20260524 1706) ((emacs (27 1)))
-    "Interaction mode for making comint shells" tar
-    ((:url . "https://github.com/xenodium/shell-maker")
-     (:commit . "e8bdf6dca18f39d592728e8440118d9f57092e65")
-     (:revdesc . "e8bdf6dca18f"))])

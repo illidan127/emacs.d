@@ -1,8 +1,8 @@
 Ghostel is an Emacs terminal emulator powered by libghostty-vt, the
 terminal emulation library extracted from the Ghostty project.  A
-native Zig dynamic module handles VT parsing, terminal state, and
-rendering, while this Elisp layer manages the shell process, keymap,
-buffer, and user-facing commands.
+native Zig dynamic module handles VT parsing, terminal state, rendering,
+and (for local buffers) PTY I/O, while this Elisp layer manages keymaps,
+buffers, user-facing commands, and remote process integration.
 
 Usage:
 
@@ -44,7 +44,7 @@ Shell integration:
 Native module:
 
   A pre-built binary is downloaded automatically on first use.  To
-  build from source instead (requires Zig 0.15.2+), run zig build
+  build from source instead (requires Zig 0.15.2+), run zig build --prefix .
   from the project root, or M-x ghostel-module-compile.  M-x
   ghostel-download-module re-fetches the pre-built binary.
 

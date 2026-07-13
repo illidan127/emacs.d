@@ -1,16 +1,19 @@
-This package provides a uniform Emacs interface for various AI-assisted software
-development CLI tools. Its purpose is to offer a consistent user experience
-across different AI backends, providing context-aware code actions, and integrating
-seamlessly with AI-driven agile development workflows.
+This package provides a uniform Emacs interface for various
+AI-assisted software development CLI tools.  Its purpose is to
+offer a consistent user experience across different AI backends,
+providing context-aware code actions, and integrating seamlessly
+with AI-driven agile development workflows.
 
 URL: https://github.com/tninja/ai-code-interface.el
 
 Supported AI coding CLIs include:
-  - Claude Code
-  - Gemini CLI
   - OpenAI Codex
-  - GitHub Copilot CLI
+  - Antigravity CLI
   - Opencode
+  - Claude Code
+  - GitHub Copilot CLI
+  - Gemini CLI
+  - Kilo
   - Grok CLI
   - Cursor CLI
   - Kiro CLI
@@ -39,15 +42,19 @@ Basic configuration example:
 
 (use-package ai-code
   :config
-  ;; use codex as backend, other options are 'gemini, 'github-copilot-cli, 'opencode, 'grok, 'claude-code-ide, 'claude-code-el, 'claude-code, 'cursor, 'kiro, 'codebuddy, 'aider, 'agent-shell, 'eca
+  ;; use codex as backend, other options are 'gemini, 'github-copilot-cli, 'opencode, 'kilo, 'grok, 'claude-code-ide, 'claude-code-el, 'claude-code, 'cursor, 'kiro, 'codebuddy, 'aider, 'agent-shell, 'eca
   (ai-code-set-backend 'codex) ;; set your preferred backend
   ;; Optional: use a narrower transient menu on smaller frames
   ;; (setq ai-code-menu-layout 'two-columns)
   (global-set-key (kbd "C-c a") #'ai-code-menu)
-  ;; Optional: Enable @ file completion in comments and AI sessions
-  (ai-code-prompt-filepath-completion-mode 1)
+  ;; Optional: Try ghostel or eat as an backend infra
+  ;; (setq ai-code-backends-infra-terminal-backend 'ghostel) ;; 'eat is another option
+  ;; Optional: Disable @ file completion in comments and AI sessions
+  ;; (ai-code-prompt-filepath-completion-mode -1)
   ;; Optional: Configure AI test prompting mode (e.g., ask about running tests/TDD) for a tighter build-test loop
   (setq ai-code-auto-test-type 'ask-me)
+  ;; Optional: Disable numbered next steps for discussion prompts at send time
+  ;; (setq ai-code-discussion-auto-follow-up-enabled nil)
   ;; Optional: In the AI session buffer (Evil normal state), SPC triggers the prompt entry UI
   (with-eval-after-load 'evil (ai-code-backends-infra-evil-setup))
   (global-auto-revert-mode 1)
