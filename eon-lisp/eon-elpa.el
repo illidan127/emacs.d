@@ -11,23 +11,20 @@
 	    (expand-file-name "eon-elpa-working" no-littering-var-directory)
 	  (expand-file-name "eon-elpa-working" user-emacs-directory))))
 
-(defun eon-elpa--build-one (recipe &optional force)
-  "调用`package-build'按RECIPE构建对应包。
-如果FORCE为nil，则仅当RECIPE中版本与archive-contents中版本不一致时才重新构建。"
+(defun eon-elpa--build-one (recipe)
+  "调用`package-build'按RECIPE构建对应包。"
   (package-build-archive recipe)
   (package-build-cleanup))
 
-(defun eon-elpa-build (recipes &optional force)
-  "构建RECIPES指定的包
-如果FORCE为nil，则只更新版本有变化的包。"
+(defun eon-elpa-build (recipes)
+  "构建RECIPES指定的包。"
   (dolist (recipe recipes)
-    (eon-elpa--build-one recipe force)))
+    (eon-elpa--build-one recipe)))
 
-(defun eon-elpa-build-all (&optional force)
-  "重新构建所有包
-如果FORCE为nil，则只更新版本有变化的包。"
-  (interactive "P")
-  (eon-elpa-build (directory-files package-build-recipes-dir nil "^[^.]") force))
+(defun eon-elpa-build-all ()
+  "重新构建所有包。"
+  (interactive)
+  (eon-elpa-build (directory-files package-build-recipes-dir nil "^[^.]")))
 
 (defun eon-elpa-find-missing-recipes ()
   "找出已安装的非内置扩展中在 recipes 目录没有对应配方的包"
@@ -36,10 +33,9 @@
         (recipe-files (directory-files package-build-recipes-dir nil "^[^.]"))
         missing-packages)
     (dolist (pkg-desc installed-packages)
-      (message "%s" pkg-desc)
       (let* ((pkg-name (symbol-name (car pkg-desc)))
-             (pkg-desc (cadr pkg-desc))
-             (built-in (eq (package-desc-archive pkg-desc) 'builtin)))
+             (desc (cadr pkg-desc))
+             (built-in (eq (package-desc-archive desc) 'builtin)))
         (when (and (not built-in)
                    (not (member pkg-name recipe-files)))
           (push pkg-name missing-packages))))
@@ -57,7 +53,7 @@
                         (let ((pkg-dir (expand-file-name recipe package-build-working-dir)))
                           (when (file-exists-p pkg-dir)
                             (delete-directory pkg-dir t))
-                          (eon-elpa--build-one recipe t))))))
+                          (eon-elpa--build-one recipe))))))
 
 (defun eon-elpa--remote-archive-dir-p (dir)
   "判断 DIR 是否为远程 package archive 路径。"
@@ -91,10 +87,6 @@
         (cl-remove-if (lambda (archive)
                         (eon-elpa--remote-archive-dir-p (cdr archive)))
                       package-archives)))
-
-(defun eon-elpa--harden-package-sources ()
-  "加固 package 安装源，禁止从网络下载或注册远程 archive。"
-  (eon-elpa--sanitize-package-archives))
 
 (define-advice package-download-transaction
     (:around (fn &rest args) eon-elpa-block-package-download)
@@ -157,6 +149,6 @@
                  (nth 0 v) (version-to-string (nth 1 v)) (version-to-string (nth 2 v)))))
     (list :violations violations :version-mismatches version-mismatches)))
 
-(eon-elpa--harden-package-sources)
+(eon-elpa--sanitize-package-archives)
 
 (provide 'eon-elpa)
