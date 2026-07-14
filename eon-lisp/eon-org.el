@@ -224,7 +224,6 @@
 	  ("#+end_src" . (?结 (Br . Bl) ?束))
 	  ("#+RESULTS:" . ,(eon-string-to-symbol-list "结果："))
 	  ("进行中" . ,(eon-string-to-symbol-list "[进行中]"))
-	  ("开发中" . ,(eon-string-to-symbol-list "[开发中]"))
 	  ("待发布" . ,(eon-string-to-symbol-list "[待发布]"))
 	  ("发布中" . ,(eon-string-to-symbol-list "[发布中]"))
 	  ("待办" . ,(eon-string-to-symbol-list "[待办]"))
@@ -337,10 +336,12 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (plist-put org-format-latex-options :background "Transparent")
   (setq org-todo-keywords
 	'((sequence "待办(D)" "进行中(j)" "待发布(d)" "发布中(f)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
+  (setq org-agenda-sorting-strategy '((agenda todo-state-down habit-down time-up urgency-down category-keep)
+				      (todo todo-state-down) (tags urgency-down category-keep)
+				      (search category-keep)))
   (setq org-todo-keyword-faces
 	'(("待办" . "red")
 	  ("进行中" . (:foreground "#51cf66" :weight bold))
-	  ("开发中" . (:foreground "#51cf66" :weight bold))
 	  ("待发布" . (:foreground "#ffd43b" :weight bold))
 	  ("发布中" . (:foreground "#ff922b" :weight bold))
 	  ("完成" . "green")
@@ -423,8 +424,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (org-mode . eon-org-setup-expand-region))
 
 
-(use-package
-  org-latex-impatient
+(use-package org-latex-impatient
   :defer t
   :disabled
   :after (org)
@@ -438,9 +438,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
 	#'posframe-poshandler-point-window-center)
   :hook (org-mode . org-latex-impatient-mode))
 
-(use-package
-  ;;; latex公式行内图片
-  org-fragtog
+(use-package org-fragtog
   :hook (org-mode . org-fragtog-mode))
 
 (use-package epa-file

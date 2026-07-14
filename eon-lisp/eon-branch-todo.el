@@ -220,7 +220,7 @@ Prompts the user to select an existing TODO, create a new one, or skip."
                   (unless (org-at-heading-p) (outline-next-heading))
                   (org-insert-heading-respect-content)
                   (insert title)
-                  (org-todo 'next))
+                  (org-todo "待办"))
                 (let ((uuid (org-id-get-create)))
                   (eon-branch-todo--add-eon-link uuid workspace-root branch)
                   (eon-branch-todo--write-yaml-section yaml-file branch uuid)
