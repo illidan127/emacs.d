@@ -74,22 +74,8 @@ Returns alist of (branch . uuid)."
 
 ;;; TODO collection
 
-(defun eon-branch-todo--under-project-or-work-p ()
-  "Return non-nil if current heading is under a level-1 heading named 工作 or 项目."
-  (let ((under-project nil))
-    (save-excursion
-      (while (and (org-up-heading-safe)
-                  (not under-project))
-        (when (= (org-current-level) 1)
-          (let ((parent-title (org-get-heading t t t t)))
-            (when (or (string-match-p "工作" parent-title)
-                      (string-match-p "项目" parent-title))
-              (setq under-project t))))))
-    under-project))
-
 (defun eon-branch-todo--collect-todos ()
   "Collect non-done TODO items from `org-agenda-files'.
-Only includes items under level-1 headings named 工作 or 项目.
 Returns alist of (display-string . marker)."
   (let (result)
     (dolist (file org-agenda-files)
@@ -101,20 +87,17 @@ Returns alist of (display-string . marker)."
               (org-map-entries
                (lambda ()
                  (let ((todo (org-get-todo-state)))
-                   (when todo
-                     (let ((done (org-entry-is-done-p))
-                           (under (eon-branch-todo--under-project-or-work-p)))
-                       (when (and (not done) under)
-                         (let* ((title (org-get-heading t t t t))
-                                (id (org-entry-get (point) "ID"))
-                                (display
-                                 (format "%-6s  %s  [%s]%s"
-                                         (format "[%s]" todo)
-                                         (string-trim (replace-regexp-in-string
-                                                       "\\[.*?\\]" "" title))
-                                         (file-name-nondirectory file)
-                                         (if id "" " ⚠无ID"))))
-                           (push (cons display (point-marker)) result)))))))
+                   (when (and todo (not (org-entry-is-done-p)))
+                     (let* ((title (org-get-heading t t t t))
+                            (id (org-entry-get (point) "ID"))
+                            (display
+                             (format "%-6s  %s  [%s]%s"
+                                     (format "[%s]" todo)
+                                     (string-trim (replace-regexp-in-string
+                                                   "\\[.*?\\]" "" title))
+                                     (file-name-nondirectory file)
+                                     (if id "" " ⚠无ID"))))
+                       (push (cons display (point-marker)) result)))))
                nil
                'file))))))
     (sort result
