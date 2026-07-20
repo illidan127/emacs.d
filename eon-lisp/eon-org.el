@@ -335,7 +335,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   ;; org-latex-preview时设置背景透明
   (plist-put org-format-latex-options :background "Transparent")
   (setq org-todo-keywords
-	'((sequence "待办(D)" "进行中(j)" "待发布(d)" "发布中(f)" "暂缓(z)" "|" "完成(w)" "放弃(g)")))
+	'((sequence "待办(D)" "暂缓(z)" "进行中(j)" "待发布(d)" "发布中(f)" "|" "完成(w)" "放弃(g)")))
   (setq org-agenda-sorting-strategy '((agenda todo-state-down habit-down time-up urgency-down category-keep)
 				      (todo todo-state-down) (tags urgency-down category-keep)
 				      (search category-keep)))

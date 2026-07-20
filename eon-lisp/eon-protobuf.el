@@ -19,7 +19,6 @@
 		    (region-end)
 		  (point-max))
 		current-prefix-arg))
-  (message "relace %s" replace)
   (let ((command (format "python3 %s" (f-join eon-tools-path "proto-format.py"))))
     (shell-command-on-region start end command t replace)))
 
