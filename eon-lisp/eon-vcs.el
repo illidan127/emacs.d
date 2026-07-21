@@ -367,8 +367,6 @@
   (interactive (list (magit-get-current-branch)))
   (transient-setup 'eon-magit-branch nil nil :scope branch))
 
-(fset 'magit-branch 'eon-magit-branch)
-
 ;;;###autoload
 (defun eon-magit-branch-read-args (prompt &optional default-start)
   "创建新分支时，规范分支命名"

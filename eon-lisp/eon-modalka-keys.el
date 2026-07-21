@@ -458,7 +458,7 @@
     (define-key keymap (kbd "e") #'eval-last-sexp)
     (define-key keymap (kbd "b") #'switch-to-buffer)
     (define-key keymap (kbd "d") #'dired)
-    (define-key keymap (kbd "g") #'magit-status)
+    (define-key keymap (kbd "g") #'eon-magit-status)
     (define-key keymap (kbd "G") #'eon-magit-status-wrapper)
     (pcase major-mode
       (_ (set-transient-map keymap nil nil nil eon-sub-keymap-waiting-time)))))

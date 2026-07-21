@@ -170,6 +170,7 @@ agent-shell，最后在已打开 agent-shell 的工作区窗口间循环切换�
           (select-window (get-buffer-window agent-buf (eon-workspace-frame next-ws))))))))
 
 
+(use-package eon-magit)
 (use-package eon-workspace
   :demand t
   :bind (("<f8>" . eon-workspace-create)
