@@ -1,0 +1,1 @@
+(compat :fetcher github :repo "emacs-compat/compat" :commit "31.0.0.2")
