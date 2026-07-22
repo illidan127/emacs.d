@@ -107,9 +107,9 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
         (with-current-buffer buf
           (git-commit-setup))))))
 
-(defun eon-magit-agent-commit--send-agent-request (shell &optional commit-buffer)
+(defun eon-magit-agent-commit--send-agent-request (shell &optional commit-buffer prompt-override)
   (require 'agent-shell)
-  (let ((prompt (eon-magit-agent-commit--build-prompt)))
+  (let ((prompt (or prompt-override (eon-magit-agent-commit--build-prompt))))
     (when commit-buffer
       (setq eon-magit-agent-commit--commit-buffer commit-buffer))
     (setq eon-magit-agent-commit--pending-p t)
@@ -220,6 +220,28 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
               (string-trim (string-join (butlast (cdr lines)) "\n"))))
         trimmed))))
 
+(defvar eon-magit-agent-commit--simplify-retry nil
+  "非 nil 表示当前正在等待 LLM 简化标题。
+值为上一轮的原始 message，用于合并正文。")
+
+(defun eon-magit-agent-commit--title-too-long-p (message)
+  "判断 MESSAGE 首行是否超过 50 字。"
+  (when (and message (not (string-empty-p (string-trim message))))
+    (let ((first (car (split-string message "\n"))))
+      (> (string-width first) 50))))
+
+(defun eon-magit-agent-commit--request-simplify (message shell-buffer)
+  "向 agent 请求简化 MESSAGE 标题。"
+  (setq eon-magit-agent-commit--simplify-retry message)
+  (eon-magit-agent-commit--send-agent-request
+   shell-buffer
+   nil                               ; 不记录 commit-buffer
+   (format (concat "以下提交信息标题超过 50 字，请将其简化。\n"
+                   "要求：仅输出简化后的提交信息正文，严禁任何前缀或解释性文字，\n"
+                   "标题控制 50 字以内，确需补充说明时空一行再写正文。\n\n"
+                   "```\n%s\n```")
+           message)))
+
 (defun eon-magit-agent-commit--resolve-commit-buffer ()
   "返回当前仓库的 git commit message buffer，必要时更新缓存。"
   (let ((buf
@@ -322,16 +344,36 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
     (eon-magit-agent-commit--cleanup-subscription)
     (if (equal stop-reason "end_turn")
         (let ((msg (eon-magit-agent-commit--last-agent-message shell-buffer)))
-          (if eon-magit-agent-commit--deferred-commit
-              (progn
-                (unless msg
-                  (message "Agent 回复为空，将打开空白提交 buffer"))
-                (eon-magit-agent-commit--complete-prefetch msg))
-            (if msg
-                (eon-magit-agent-commit--finish-ai-flow msg)
-              (progn
-                (message "Agent 回复为空，请选择 commit-class 后手动编写")
-                (eon-magit-agent-commit--finish-ai-flow nil)))))
+          (cond
+           ;; 简化重试返回的消息：直接使用，不再检查长度以防死循环
+           (eon-magit-agent-commit--simplify-retry
+            (setq eon-magit-agent-commit--simplify-retry nil)
+            (if eon-magit-agent-commit--deferred-commit
+                (progn
+                  (unless msg
+                    (message "Agent 回复为空，将打开空白提交 buffer"))
+                  (eon-magit-agent-commit--complete-prefetch msg))
+              (if msg
+                  (eon-magit-agent-commit--finish-ai-flow msg)
+                (progn
+                  (message "Agent 回复为空，请选择 commit-class 后手动编写")
+                  (eon-magit-agent-commit--finish-ai-flow nil)))))
+           ;; 首次生成：标题超长 → 发回 LLM 简化
+           ((and msg (eon-magit-agent-commit--title-too-long-p msg))
+            (message "提交信息标题超 50 字，正在请求 AI 简化…")
+            (eon-magit-agent-commit--request-simplify msg shell-buffer))
+           ;; 正常：标题合规或无消息
+           (t
+            (if eon-magit-agent-commit--deferred-commit
+                (progn
+                  (unless msg
+                    (message "Agent 回复为空，将打开空白提交 buffer"))
+                  (eon-magit-agent-commit--complete-prefetch msg))
+              (if msg
+                  (eon-magit-agent-commit--finish-ai-flow msg)
+                (progn
+                  (message "Agent 回复为空，请选择 commit-class 后手动编写")
+                  (eon-magit-agent-commit--finish-ai-flow nil)))))))
       (if eon-magit-agent-commit--deferred-commit
           (progn
             (message "Agent 未完成回复（%s），将打开空白提交 buffer"
