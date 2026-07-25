@@ -355,7 +355,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (add-to-list
    'org-capture-templates
    `("w" "待办" entry (file ,(car org-agenda-files))
-     "* 待办 %? %x" :prepend t :before-finalize org-id-get-create))
+     "* 待办 %x%?" :prepend t :before-finalize org-id-get-create))
 
   ;; 优先级设置
   (setq
