@@ -170,14 +170,26 @@
   (define-advice magit-run-git (:before (&rest args) eon--ensure-git-user-identity-direct)
     (when (equal (car args) "commit")
       (eon--ensure-git-user-identity-before-direct-commit)))
-  (define-advice magit-status (:around (orig-fun &optional directory cache) eon-magit-status-workspace-aware)
-    "若当前 frame 属于 workspace，则以 workspace root 作为仓库目录。"
-    (if (and (called-interactively-p 'any)
-             (not directory)
+  (defun eon-magit-status-workspace-aware (orig-fun &optional directory cache)
+    "若当前 workspace 存在，则以 workspace root 作为仓库目录。"
+    (interactive
+     (let ((default-directory
+            (if (and (fboundp 'eon-workspace-current)
+                     (eon-workspace-current))
+                (eon-workspace-root (eon-workspace-current))
+              default-directory)))
+       (let ((magit--refresh-cache (list (cons 0 0))))
+         (list (and (or current-prefix-arg (not (magit-toplevel)))
+                    (progn (magit--assert-usable-git)
+                           (magit-read-repository
+                            (>= (prefix-numeric-value current-prefix-arg) 16))))
+               magit--refresh-cache))))
+    (if (and (not directory)
              (fboundp 'eon-workspace-current)
              (eon-workspace-current))
         (funcall orig-fun (eon-workspace-root (eon-workspace-current)) cache)
       (funcall orig-fun directory cache)))
+  (advice-add 'magit-status :around #'eon-magit-status-workspace-aware)
   (setq magit-log-margin
 	'(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
   (setq magit-diff-refine-hunk t)
