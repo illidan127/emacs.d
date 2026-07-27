@@ -170,6 +170,14 @@
   (define-advice magit-run-git (:before (&rest args) eon--ensure-git-user-identity-direct)
     (when (equal (car args) "commit")
       (eon--ensure-git-user-identity-before-direct-commit)))
+  (define-advice magit-status (:around (orig-fun &optional directory cache) eon-magit-status-workspace-aware)
+    "若当前 frame 属于 workspace，则以 workspace root 作为仓库目录。"
+    (if (and (called-interactively-p 'any)
+             (not directory)
+             (fboundp 'eon-workspace-current)
+             (eon-workspace-current))
+        (funcall orig-fun (eon-workspace-root (eon-workspace-current)) cache)
+      (funcall orig-fun directory cache)))
   (setq magit-log-margin
 	'(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
   (setq magit-diff-refine-hunk t)
@@ -662,8 +670,4 @@ Returns plist or nil if user cancels or repo has no tags."
          (result (eon-magit-repo-tag-info--collect repo)))
     (when result
       (eon-magit-repo-tag-info--display (list result)))))
-(require 'eon-branch-todo)
-(advice-add 'magit-branch-and-checkout :after #'eon-branch-todo--after-branch-create)
-(advice-add 'magit-branch-create :after #'eon-branch-todo--after-branch-create)
-
 (provide 'eon-vcs)
