@@ -39,18 +39,6 @@
 
 (eon-add-hooks 'prog-mode-hook 'display-line-numbers-mode 'yas-minor-mode)
 
-(use-package aider
-  :disabled
-  :if (and (boundp 'openai_api_base) (stringp openai_api_base) (> (length openai_api_base) 0)
-           (boundp 'openai_api_key) (stringp openai_api_key) (> (length openai_api_key) 0)
-           (boundp 'deepseek_api_key) (stringp deepseek_api_key) (> (length deepseek_api_key) 0))
-  :config
-  (setenv "OPENAI_API_BASE" openai_api_base)
-  (setenv "OPENAI_API_KEY" openai_api_key)
-  (setenv "DEEPSEEK_API_KEY" deepseek_api_key)
-  (setq aider-args '("--model" "deepseek/deepseek-chat" "--no-auto-commits" "--no-gitignore" "--no-show-model-warnings"))
-  (global-set-key (kbd "C-c a") 'aider-transient-menu))
-
 (use-package terminal-here
   :config
   (setq terminal-here-mac-terminal-command 'kitty)
