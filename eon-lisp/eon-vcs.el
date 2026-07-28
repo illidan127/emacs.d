@@ -190,6 +190,11 @@
         (funcall orig-fun (eon-workspace-root (eon-workspace-current)) cache)
       (funcall orig-fun directory cache)))
   (advice-add 'magit-status :around #'eon-magit-status-workspace-aware)
+
+  ;; magit-list-tags 返回自然版本逆序：v2.0.0 → v1.10.0 → v1.2.0
+  (advice-add 'magit-list-tags :filter-return
+              (lambda (tags) (nreverse (sort tags #'eon-version-string<))))
+
   (setq magit-log-margin
 	'(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
   (setq magit-diff-refine-hunk t)
