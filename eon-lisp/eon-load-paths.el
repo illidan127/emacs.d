@@ -22,7 +22,7 @@
   (declare (indent 1))
   (when-let ((dir (alist-get name eon-package-dirs)))
     (unless (plist-get args :load-path)
-      (setq args (nconc args (list :load-path `(,dir)))))
+      (setq args (nconc args (list :load-path (if (listp dir) dir (list dir))))))
     (unless (plist-member args :ensure)
       (setq args (nconc args '(:ensure nil)))))
   (apply eon--use-package-orig name args))
