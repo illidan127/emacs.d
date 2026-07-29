@@ -33,6 +33,7 @@
   (interactive)
   (let ((keymap (make-sparse-keymap)))
     (define-key keymap (kbd "p s") #'eon-workspace-open)
+    (define-key keymap (kbd "p a") #'eon-workspace-action)
     (define-key keymap (kbd "p g") #'eon-workspace-rg)
     (define-key keymap (kbd "p f") #'eon-workspace-find-file)
     (define-key keymap (kbd "d") #'youdao-dictionary-search-at-point-posframe)
