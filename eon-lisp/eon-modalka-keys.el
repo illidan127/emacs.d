@@ -421,7 +421,7 @@
   (let ((realkey
 	 (pcase major-mode
 	   ('magit-status-mode (eon-magit-key-infer "r"))
-	   ('org-mode #'org-refile)
+	   ('org-mode #'eon-org-migrate-todo)
 	   (_ #'em-r-command))))
     realkey))
 

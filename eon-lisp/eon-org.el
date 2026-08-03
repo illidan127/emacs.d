@@ -91,6 +91,25 @@
   (interactive)
   (find-file (car org-agenda-files)))
 
+(defun eon-org-migrate-todo ()
+  "将当前待办项迁移到另一个 agenda 文件。
+弹出 ivy 选择框列出所有 agenda 文件（排除当前文件）。"
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+         (candidates (remove current-file org-agenda-files)))
+    (if (null candidates)
+        (user-error "没有可迁移的目标文件（org-agenda-files 中只有一个文件）")
+      (ivy-read "迁移到: "
+                (mapcar (lambda (f) (cons (file-name-nondirectory f) f)) candidates)
+                :action (lambda (target-file)
+                          (org-cut-subtree)
+                          (find-file (cdr target-file))
+                          (goto-char (point-min))
+                          (org-paste-subtree)
+                          (save-buffer)
+                          (with-current-buffer (find-file-noselect current-file)
+                            (save-buffer)))))))
+
 (defun eon-org-agenda-goto-and-narrow ()
   "在 org-agenda 中跳转到待办条目并窄化到该子树"
   (interactive)
@@ -142,8 +161,16 @@
        (eon-org-agenda--dispatch ,key))))
 
 (eon-org-agenda--def-cmd "a" "Agenda：本周或本日")
-(eon-org-agenda--def-cmd "n" "Agenda：全部 agenda 和 TODO")
-(eon-org-agenda--def-cmd "t" "Agenda：全部 TODO")
+(defun eon-org-agenda--work ()
+  "工作 TODO（仅 tasks.org）"
+  (interactive)
+  (eon-org-agenda--dispatch "W"))
+
+(defun eon-org-agenda--life ()
+  "非工作 TODO（仅 life.org）"
+  (interactive)
+  (eon-org-agenda--dispatch "L"))
+
 (eon-org-agenda--def-cmd "T" "Agenda：指定 TODO 关键字")
 (eon-org-agenda--def-cmd "m" "Agenda：TAGS/PROP 查询")
 (eon-org-agenda--def-cmd "M" "Agenda：TAGS 查询（仅 TODO）")
@@ -186,8 +213,8 @@
   "Org Agenda 命令（替代 *Agenda Commands* buffer）"
   [["Agenda"
     ("a" "本周/本日" eon-org-agenda--a)
-    ("n" "全部 agenda+TODO" eon-org-agenda--t)
-    ("t" "全部 TODO" eon-org-agenda--t)
+    ("n" "工作 TODO" eon-org-agenda--work)
+    ("t" "非工作 TODO" eon-org-agenda--life)
     ("T" "指定 TODO 关键字" eon-org-agenda--T)]
    ["查询"
     ("m" "TAGS/PROP" eon-org-agenda--m)
@@ -311,7 +338,8 @@ EON-AGENDA-QUERY-REGEXP的记录"
                         (setq ok nil))))))))
   ;; org文件夹路径
   (eon-treesit-enable 'org)
-  (eon-set-org-directory)
+  (if (functionp 'eon-set-org-directory)
+      (eon-set-org-directory))
   ;; (setq org-closed-string "完成于:")
   ;; (setq org-element-closed-keyword "完成于:") ;; 非常重要，org根据此关键字识别 :closed 属性
   :config
@@ -323,7 +351,13 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (setq truncate-lines nil)
   ;; 日程相关配置
   (setq calendar-week-start-day 1)
-  (setq org-agenda-files (list (file-name-concat org-directory "tasks.org")))
+  (setq org-agenda-files (list (file-name-concat org-directory "tasks.org")
+			   (file-name-concat org-directory "life.org")))
+  (setq org-agenda-custom-commands
+        `(("W" "工作 TODO" todo ""
+           ((org-agenda-files (list ,(file-name-concat org-directory "tasks.org")))))
+          ("L" "非工作 TODO" todo ""
+           ((org-agenda-files (list ,(file-name-concat org-directory "life.org")))))))
   (setq org-agenda-todo-ignore-deadlines 'far)
   (setq org-agenda-todo-ignore-scheduled 'future)
   (setq org-use-tag-inheritance nil)
@@ -355,6 +389,10 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (add-to-list
    'org-capture-templates
    `("w" "待办" entry (file ,(car org-agenda-files))
+     "* 待办 %x%?" :prepend t :before-finalize org-id-get-create))
+  (add-to-list
+   'org-capture-templates
+   `("t" "非工作待办" entry (file ,(file-name-concat org-directory "life.org"))
      "* 待办 %x%?" :prepend t :before-finalize org-id-get-create))
 
   ;; 优先级设置
