@@ -83,6 +83,7 @@
   (parseedn :url "https://github.com/clojure-emacs/parseedn")
   (pdf-tools :url "https://github.com/vedang/pdf-tools")
   (pfuture :url "https://github.com/Alexander-Miller/pfuture")
+  (pie :url "https://github.com/illidan127/pie.git")
   (pinentry :url "https://github.com/ueno/pinentry-el.git")
   (polymode :url "https://github.com/polymode/polymode")
   (popup :url "https://github.com/auto-complete/popup-el")

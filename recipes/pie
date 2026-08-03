@@ -1,0 +1,4 @@
+(pie
+:fetcher git
+:url "https://github.com/illidan127/pie.git"
+:files (:defaults "bridge" "extensions"))

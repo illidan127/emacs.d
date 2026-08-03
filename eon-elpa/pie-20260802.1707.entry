@@ -1,0 +1,6 @@
+(pie
+ . [(20260802 1707) ((emacs (29 1)) (shell-maker (0 91 2)))
+    "Pie AI agent，基于 shell-maker 和 Pi SDK" tar
+    ((:url . "https://github.com/dingoding/pie")
+     (:commit . "66be8f13db29c7f04abf60654848b09617b75186")
+     (:revdesc . "66be8f13db29"))])
