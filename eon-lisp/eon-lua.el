@@ -2,12 +2,12 @@
 
 (use-package lua-ts-mode
   :init
-  ;;; 欺骗 lsp-lua 中检测lua lsp的函数
-  (setq lsp-clients-lua-language-server-main-location user-emacs-directory)
-  (setq lsp-clients-lua-language-server-bin user-emacs-directory)
+  ;;; 通过 nix 安装 lua-language-server，显式指向二进制。
+  ;;; 新版 lsp-lua 用 executable-find 检测 bin，不能再指向目录。
+  (setq lsp-clients-lua-language-server-bin
+        (expand-file-name "bin/lua-language-server" "~/.nix-profile"))
   (add-to-list 'eon-treesit-fold-modes 'lua-ts-mode)
 
-  ;;; 通过nix直接安装
   :after (lsp-mode)
   :config
   :mode ("\\.lua\\'" . lua-ts-mode)
