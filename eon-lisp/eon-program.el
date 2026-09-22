@@ -65,12 +65,17 @@
           (select-window win))
       (pop-to-buffer buf))))
 
+(use-package acp)
+(use-package shell-maker)
+
 (use-package agent-shell
   :config
   (setq agent-shell-anthropic-claude-environment
         (apply #'agent-shell-make-environment-variables claude-env))
+  (setq agent-shell-pi-environment (apply #'agent-shell-make-environment-variables pi-env))
   (setq agent-shell-goose-authentication
         (agent-shell-make-goose-authentication :none t))
+  (setq agent-shell-pi-acp-command '("pi-acp" "--" "--model" "deepseek-flash" "--provider" "deepseek"))
   )
 
 (use-package ghostel

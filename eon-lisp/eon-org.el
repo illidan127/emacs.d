@@ -320,6 +320,16 @@ EON-AGENDA-QUERY-REGEXP的记录"
   (add-to-list 'er/try-expand-list 'eon/mark-url-weak-segment 'append)
   (add-to-list 'er/try-expand-list 'eon/mark-url-strong-cross 'append))
 
+(use-package org-modern
+  :disabled
+  :after (org))
+
+(use-package org-modern-indent
+  :disabled
+  :after (org)
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+
 (use-package org
   :ensure nil
   :init
@@ -445,6 +455,7 @@ EON-AGENDA-QUERY-REGEXP的记录"
   ("C-c o a" . eon-org-agenda)
   ("C-c o o" . org-capture)
   :hook
+  ;; (org-mode . org-modern-mode)
   ;; 添加或修改待办事项后，保存所有org文件
   (org-capture-after-finalize . org-save-all-org-buffers)
   (org-agenda-finalize . org-save-all-org-buffers)
