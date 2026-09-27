@@ -25,7 +25,7 @@ Key bindings in the terminal buffer:
   C-c C-c   Interrupt          C-c C-z   Suspend
   C-c C-d   EOF                C-c C-\   Quit
   C-c C-t   Copy mode          C-c C-y   Paste
-  C-c C-l   Clear scrollback   C-c C-q   Send next key literally
+  C-c M-l   Clear scrollback   C-q       Send next key literally
   C-c M-w   Copy scrollback    C-y / M-y Yank / yank-pop
   C-c C-n / C-c C-p            Next/previous hyperlink
   C-c M-n / C-c M-p            Next/previous prompt (OSC 133)
@@ -43,10 +43,10 @@ Shell integration:
 
 Native module:
 
-  A pre-built binary is downloaded automatically on first use.  To
-  build from source instead (requires Zig 0.15.2+), run zig build --prefix .
-  from the project root, or M-x ghostel-module-compile.  M-x
-  ghostel-download-module re-fetches the pre-built binary.
+  A pre-built binary is downloaded automatically on first use.
+  To build from source instead (requires exactly Zig 0.16.0), run
+  zig build --prefix . from the project root, or M-x ghostel-module-compile.
+  M-x ghostel-download-module re-fetches the pre-built binary.
 
 See also: evil-ghostel.el (evil-mode integration), ghostel-compile.el
 (TTY-backed M-x compile replacement), ghostel-eshell.el (eshell

@@ -1,0 +1,9 @@
+(whisper
+ . [(20260717 1038) ((emacs (27 1)))
+    "Speech-to-Text interface using OpenAI's whisper model" tar
+    ((:url . "https://github.com/natrys/whisper.el")
+     (:commit . "d09b23d999ee120e98adf50fa809f8b8a5c165e6")
+     (:revdesc . "d09b23d999ee")
+     (:authors ("Imran Khan" . "imran@khan.ovh"))
+     (:maintainers ("Imran Khan" . "imran@khan.ovh"))
+     (:maintainer "Imran Khan" . "imran@khan.ovh"))])

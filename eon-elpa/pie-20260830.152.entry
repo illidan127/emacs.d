@@ -1,0 +1,5 @@
+(pie
+ . [(20260830 152) ((emacs (29 1))) "Pie AI agent" tar
+    ((:url . "https://github.com/dingoding/pie")
+     (:commit . "dac3c8583e95466436261de65b62886b60cafc03")
+     (:revdesc . "dac3c8583e95"))])
