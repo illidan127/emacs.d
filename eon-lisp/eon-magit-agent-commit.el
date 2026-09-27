@@ -98,12 +98,12 @@ with-editor 通过 `find-file-noselect' 打开已有 buffer 时不会再次触�
   "AI 预生成结束：保存 draft，再打开 COMMIT_EDITMSG buffer。"
   (setq eon-magit-agent-commit--pending-p nil
         eon-magit-agent-commit--draft-message message)
-  (when-let ((commit-fn (prog1 eon-magit-agent-commit--deferred-commit
+  (when-let* ((commit-fn (prog1 eon-magit-agent-commit--deferred-commit
                           (setq eon-magit-agent-commit--deferred-commit nil))))
     (funcall commit-fn)
     ;; visit hook 未消费 draft 时再补跑 setup（例如极端 buffer 复用场景）
     (when eon-magit-agent-commit--draft-message
-      (when-let ((buf (eon-magit-agent-commit--resolve-commit-buffer)))
+      (when-let* ((buf (eon-magit-agent-commit--resolve-commit-buffer)))
         (with-current-buffer buf
           (git-commit-setup))))))
 

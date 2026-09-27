@@ -52,7 +52,7 @@
    (
     (t
      :foreground "#7a88cf"
-     :background "unspecified"
+     :background unspecified
      :height 140
      :italic t))))
 
@@ -230,7 +230,7 @@
   (blamer-min-offset 20)
   :custom-face
   (blamer-face ((t :foreground "#7a88cf"
-                   :background nil
+                   :background unspecified
                    :height 140
                    :italic t))))
 
@@ -251,7 +251,7 @@
 
 (defun eon-magit-repolist-column-tag-range (spec)
   "Display the selected tag range for the repo at SPEC."
-  (if-let ((sel (and eon-magit-repolist-tag-selections
+  (if-let* ((sel (and eon-magit-repolist-tag-selections
                       (gethash spec eon-magit-repolist-tag-selections))))
       (format "%s..%s" (car sel) (cdr sel))
     ""))
@@ -291,7 +291,7 @@
     ("g" "Goto repo" eon-open-current-git-repo)
     ("p" "Workspace" eon-workspace-magit-command)]]
   (interactive)
-  (if-let ((buffer (magit-commit-message-buffer)))
+  (if-let* ((buffer (magit-commit-message-buffer)))
       (switch-to-buffer buffer)
     (transient-setup 'eon-magit-commit)))
 
@@ -375,7 +375,7 @@
 (defun eon-magit-repolist-fetch-at-point ()
   "Fetch the repository at point."
   (interactive)
-  (when-let ((repo (tabulated-list-get-id)))
+  (when-let* ((repo (tabulated-list-get-id)))
     (run-hooks 'magit-credential-hook)
     (let ((default-directory (file-name-as-directory (expand-file-name repo))))
       (magit-run-git "remote" "update"))))
@@ -581,7 +581,7 @@ Returns plist or nil if user cancels or repo has no tags."
   (save-excursion
     (goto-char (point-min))
     (while (not (eobp))
-      (when-let ((m (assoc (tabulated-list-get-id) marks #'string=)))
+      (when-let* ((m (assoc (tabulated-list-get-id) marks #'string=)))
         (tabulated-list-put-tag (cdr m) nil))
       (forward-line))))
 (defun eon-magit-repolist--ensure-selections ()

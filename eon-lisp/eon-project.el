@@ -130,7 +130,7 @@
 
 (defun eon-project--current-frame-hidden-agent-shell ()
   "当前 frame 的 workspace 中有 agent-shell 但未显示在可见窗口时，返回该 buffer。"
-  (when-let ((ws (eon-workspace-current)))
+  (when-let* ((ws (eon-workspace-current)))
     (seq-find (lambda (buf)
                 (and (buffer-live-p buf)
                      (with-current-buffer buf
@@ -145,11 +145,11 @@ agent-shell，最后在已打开 agent-shell 的工作区窗口间循环切换�
   (interactive)
   (require 'agent-shell)
   (require 'eon-workspace)
-  (if-let ((buf (eon-project--current-frame-hidden-agent-shell)))
+  (if-let* ((buf (eon-project--current-frame-hidden-agent-shell)))
       (progn
         (switch-to-buffer buf)
         (message "已显示 agent-shell: %s" (buffer-name buf)))
-    (if-let ((buf (eon-project--first-blocked-agent-shell-buffer)))
+    (if-let* ((buf (eon-project--first-blocked-agent-shell-buffer)))
         (progn
           (eon-project--switch-to-buffer-in-any-frame buf)
           (message "已切换到等待授权的 agent-shell: %s" (buffer-name buf)))

@@ -20,7 +20,7 @@
 (defmacro use-package (name &rest args)
   "增强版 `use-package'，自动从 `eon-package-dirs' 注入 :load-path。"
   (declare (indent 1))
-  (when-let ((dir (alist-get name eon-package-dirs)))
+  (when-let* ((dir (alist-get name eon-package-dirs)))
     (unless (plist-get args :load-path)
       (setq args (nconc args (list :load-path (if (listp dir) dir (list dir))))))
     (unless (plist-member args :ensure)

@@ -62,7 +62,7 @@
 
 (defun eon-elpa--archive-version (pkg)
   "返回 PKG 在 eon-elpa archive 中的版本，不存在则返回 nil。"
-  (when-let ((entry (assq pkg (eon-elpa--read-archive-contents))))
+  (when-let* ((entry (assq pkg (eon-elpa--read-archive-contents))))
     (aref (cdr entry) 0)))
 
 (defun eon-elpa--package-allowed-p (pkg desc)

@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
-(require 'cl)
+(require 'cl-lib)
 
 ;;; modalka 按键适配
 
