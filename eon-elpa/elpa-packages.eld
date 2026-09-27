@@ -62,7 +62,6 @@
   (lua-mode :url "https://github.com/immerrr/lua-mode")
   (lv :url "https://github.com/abo-abo/hydra")
   (magit :url "https://github.com/magit/magit")
-  (magit-lfs :url "https://github.com/Ailrun/magit-lfs")
   (magit-section :url "https://github.com/magit/magit")
   (marginalia :url "https://github.com/minad/marginalia")
   (markdown-mode :url "https://github.com/jrblevin/markdown-mode")

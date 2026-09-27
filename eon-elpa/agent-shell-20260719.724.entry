@@ -1,7 +1,0 @@
-(agent-shell
- . [(20260719 724)
-    ((emacs (29 1)) (shell-maker (0 93 5)) (acp (0 13 1)))
-    "Native agentic integrations for Claude Code, Gemini CLI, etc" tar
-    ((:url . "https://github.com/xenodium/agent-shell")
-     (:commit . "4a4b98b008ce9dba2edf22dc3a265abd1679ab0d")
-     (:revdesc . "4a4b98b008ce"))])

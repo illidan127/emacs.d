@@ -218,6 +218,7 @@
   (add-hook 'git-commit-setup-hook 'eon--ensure-git-user-identity-on-commit-setup 50))
 
 (use-package magit-lfs
+  :disabled
   :ensure t
   :after (magit))
 
