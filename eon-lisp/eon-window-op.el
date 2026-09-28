@@ -3,6 +3,9 @@
 ;;; 窗口操作
 ;; 采用windmove包，结合vim的快捷键
 
+(setq split-width-threshold 160)
+;; (setq split-window-preferred-direction 'vertical)
+
 ;; (use-package ace-window
 ;;   :diminish t
 ;;   :demand t)
