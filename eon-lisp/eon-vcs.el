@@ -4,6 +4,12 @@
 
 (require 'eon-git-util)
 
+;; Magit 在刷新时会直接引用 `hi-lock-mode' 变量（见 magit-mode.el 中的
+;; `(when hi-lock-mode ...)'），但该变量只有在 hi-lock.el 加载之后才存在。
+;; 若此前没有任何操作触发 hi-lock，magit-refresh 会报
+;; "Symbol's value as variable is void: hi-lock-mode"。这里显式加载以规避。
+(require 'hi-lock)
+
 (defvar-local eon-magit-repolist-tag-selections nil
   "Hash table mapping repo path to (old-tag . new-tag).")
 
@@ -170,13 +176,27 @@
   (define-advice magit-run-git (:before (&rest args) eon--ensure-git-user-identity-direct)
     (when (equal (car args) "commit")
       (eon--ensure-git-user-identity-before-direct-commit)))
+  (defun eon--magit-status-repo-in-workspace ()
+    "返回当前目录所在仓库根目录（若其位于当前 workspace root 之下）。
+不在 workspace 内、当前目录不属于任何仓库，或仓库不在 workspace
+root 之下时返回 nil。"
+    (when-let* ((ws (and (fboundp 'eon-workspace-current)
+                         (eon-workspace-current)))
+                (root (eon-workspace-root ws))
+                (repo (magit-toplevel)))
+      (when (file-in-directory-p repo root)
+        repo)))
+
   (defun eon-magit-status-workspace-aware (orig-fun &optional directory cache)
-    "若当前 workspace 存在，则以 workspace root 作为仓库目录。"
+    "在 workspace 内时，优先以当前目录所在仓库作为仓库目录。
+当当前目录所在仓库位于 workspace root 之下时使用该仓库，否则回退到
+workspace root。"
     (interactive
      (let ((default-directory
             (if (and (fboundp 'eon-workspace-current)
                      (eon-workspace-current))
-                (eon-workspace-root (eon-workspace-current))
+                (or (eon--magit-status-repo-in-workspace)
+                    (eon-workspace-root (eon-workspace-current)))
               default-directory)))
        (let ((magit--refresh-cache (list (cons 0 0))))
          (list (and (or current-prefix-arg (not (magit-toplevel)))
@@ -187,7 +207,10 @@
     (if (and (not directory)
              (fboundp 'eon-workspace-current)
              (eon-workspace-current))
-        (funcall orig-fun (eon-workspace-root (eon-workspace-current)) cache)
+        (funcall orig-fun
+                 (or (eon--magit-status-repo-in-workspace)
+                     (eon-workspace-root (eon-workspace-current)))
+                 cache)
       (funcall orig-fun directory cache)))
   (advice-add 'magit-status :around #'eon-magit-status-workspace-aware)
 
