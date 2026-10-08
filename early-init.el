@@ -9,6 +9,11 @@
 		emacs-version)))
     (kill-emacs)))
 
+;;; 原生编译缓存目录
+
+;; 重定向到 no-littering 的 var 目录（data/）下，须在 early-init 设置。
+(startup-redirect-eln-cache "data/eln-cache/")
+
 ;; 某函数被调用时触发中断，打印调用栈
 ;; (debug-on-entry 'file-exists-p)
 

@@ -36,6 +36,18 @@
 ;; 忘了有啥用
 (setq native-comp-jit-compilation-deny-list '("/xr\\.el$"))
 
+;; Emacs 自带的 libgccjit 在 Darwin 上会生成非法的
+;; -mmacosx-version-min，致原生编译失败；给 driver 补上正确版本。
+;; 须在 comp 加载后追加，否则会被 defcustom 覆盖。
+(with-eval-after-load 'comp
+  (when (eq system-type 'darwin)
+    (let* ((version (string-trim (shell-command-to-string "sw_vers -productVersion")))
+	   (opt (format "-mmacosx-version-min=%s" version)))
+      (when (and (not (string-empty-p version))
+		 (not (member opt native-comp-driver-options)))
+	(setq native-comp-driver-options
+	      (append native-comp-driver-options (list opt)))))))
+
 ;; 尽早加载
 (use-package no-littering
   :init

@@ -4,10 +4,8 @@
 
 (require 'eon-git-util)
 
-;; Magit 在刷新时会直接引用 `hi-lock-mode' 变量（见 magit-mode.el 中的
-;; `(when hi-lock-mode ...)'），但该变量只有在 hi-lock.el 加载之后才存在。
-;; 若此前没有任何操作触发 hi-lock，magit-refresh 会报
-;; "Symbol's value as variable is void: hi-lock-mode"。这里显式加载以规避。
+;; Magit 刷新时引用变量 `hi-lock-mode'，该变量仅在 hi-lock.el 加载后存在，
+;; 否则报 void-variable，故显式加载。
 (require 'hi-lock)
 
 (defvar-local eon-magit-repolist-tag-selections nil
