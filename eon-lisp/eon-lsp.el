@@ -52,12 +52,4 @@ REFERENCES? t when METHOD returns references."
         (error "Not found for: %s" (or (thing-at-point 'symbol t) ""))
       (lsp-show-xrefs (lsp--locations-to-xref-items loc) display-action references?))))
 
-
-(cl-defun eon-lsp-smart-find (&key display-action)
-  (interactive)
-  (eon-first-success
-   (lsp-find-locations "textDocument/implementation" nil :display-action display-action :references? t)
-   (lsp-find-locations "textDocument/definition" nil :display-action display-action)))
-
-
 (provide 'eon-lsp)
