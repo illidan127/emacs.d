@@ -68,13 +68,32 @@
 (use-package acp)
 (use-package shell-maker)
 
+(defcustom eon-agent-shell-turn-complete-sound "/System/Library/Sounds/Glass.aiff"
+  "agent-shell 一轮对话完成后播放的声音文件；nil 表示不播放。"
+  :type '(choice (const :tag "不播放" nil) file))
+
+(defun eon-agent-shell--play-turn-complete-sound (&rest _)
+  "播放 agent-shell 对话完成提示音。"
+  (when eon-agent-shell-turn-complete-sound
+    (ignore-errors (play-sound-file eon-agent-shell-turn-complete-sound))))
+
+(defun eon-agent-shell-subscribe-turn-complete-sound ()
+  "为当前 agent-shell buffer 订阅 `turn-complete'，完成后播放提示音。"
+  (agent-shell-subscribe-to
+   :shell-buffer (current-buffer)
+   :event 'turn-complete
+   :on-event #'eon-agent-shell--play-turn-complete-sound))
+
 (use-package agent-shell
   :config
+  (add-hook 'agent-shell-mode-hook #'eon-agent-shell-subscribe-turn-complete-sound)
+  (setq agent-shell-elicitation--experimental-feature-enabled t)
+  (setq agent-shell-codebuddy-acp-command '("codebuddy" "--append-system-prompt" "**硬性约束**：所有的思考、描述、总结、注释，**必须使用简体中文**，专业述语或一些特定缩写可以保留英文，但配套解释、上下文说明必须使用简体中文。即使交流过程中，输入存在英文，输出也**必须**使用简体中文" "--acp"))
   (setq agent-shell-anthropic-claude-environment
         (apply #'agent-shell-make-environment-variables claude-env))
-  (setq agent-shell-pi-environment (apply #'agent-shell-make-environment-variables pi-env))
   (setq agent-shell-goose-authentication
         (agent-shell-make-goose-authentication :none t))
+  (setq agent-shell-pi-environment (apply #'agent-shell-make-environment-variables pi-env))
   (setq agent-shell-pi-acp-command '("pi-acp" "--" "--model" "deepseek-flash" "--provider" "deepseek"))
   )
 
