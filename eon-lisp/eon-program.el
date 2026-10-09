@@ -75,7 +75,11 @@
 (defun eon-agent-shell--play-turn-complete-sound (&rest _)
   "播放 agent-shell 对话完成提示音。"
   (when eon-agent-shell-turn-complete-sound
-    (ignore-errors (play-sound-file eon-agent-shell-turn-complete-sound))))
+    ;; 此 Emacs.app 构建无 sound 支持（play-sound-file 会报错），改用系统 afplay 异步播放
+    (condition-case err
+	(start-process "eon-agent-shell-turn-complete-sound" nil
+		       "afplay" eon-agent-shell-turn-complete-sound)
+      (error (message "eon: 播放对话完成提示音失败: %S" err)))))
 
 (defun eon-agent-shell-subscribe-turn-complete-sound ()
   "为当前 agent-shell buffer 订阅 `turn-complete'，完成后播放提示音。"
